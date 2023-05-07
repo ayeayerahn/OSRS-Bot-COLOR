@@ -11,10 +11,10 @@ from utilities.api.status_socket import StatusSocket
 class OSRSpowerminer(OSRSBot):
     def __init__(self):
         bot_title = "Power Miner"
-        description = "<Bot description here.>"
+        description = "This bot will power mine iron ore."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 1
+        self.running_time = 10
 
     def create_options(self):
         """
@@ -69,28 +69,29 @@ class OSRSpowerminer(OSRSBot):
         while time.time() - start_time < end_time:
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
-            slots = [0, 4, 8]
             spec_energy = self.get_special_energy()
             if spec_energy >= 100:
                 self.mouse.move_to(self.win.spec_orb.random_point())
                 self.mouse.click()
-            for i in range(3):
+            for i in range(20):
                 self.powermine(api_m)
-            self.drop(slots)
-            self.sleep(0.8,1.2)
+            ores = api_m.get_inv_item_indices(ids.ores)
+            gems = api_m.get_inv_item_indices(ids.gems)
+            self.drop(ores)
+            self.drop(gems)
+
             self.update_progress((time.time() - start_time) / end_time)
-
-
-    def powermine(self, api_m: MorgHTTPSocket):
-        iron_ore = self.get_all_tagged_in_rect(self.win.game_view, clr.YELLOW)
-        self.mouse.move_to(iron_ore[0].random_point())
-        self.mouse.click()
-        api_m.wait_til_gained_xp("Mining", 5)
-        self.sleep(0.1, 0.3)
 
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
+
+
+    def powermine(self, api_m: MorgHTTPSocket):
+        iron_ore = self.get_all_tagged_in_rect(self.win.game_view, clr.YELLOW)
+        self.mouse.move_to(iron_ore[0].random_point(), mouseSpeed='fastest')
+        self.mouse.click()
+        api_m.wait_til_gained_xp("Mining", 5)
 
     def sleep(self, num1, num2):
         sleep_time = rd.fancy_normal_sample(num1, num2)   
