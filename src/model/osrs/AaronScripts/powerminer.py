@@ -3,6 +3,7 @@ import time
 import utilities.api.item_ids as ids
 import utilities.color as clr
 import utilities.random_util as rd
+import pyautogui as pag
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
@@ -64,6 +65,8 @@ class OSRSpowerminer(OSRSBot):
         # api_s = StatusSocket()
 
         # Main loop
+        time.sleep(3)
+        pag.press('d')
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
