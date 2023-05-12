@@ -89,7 +89,7 @@ class OSRSardyrooftops(OSRSBot):
 
     def return_to_start(self):
         obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
-        agility_img = imsearch.BOT_IMAGES.joinpath("scraper", "ardy_agility.png")
+        agility_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ardy_agility.png")
         if not obstacle_tiles:
             # If no obstacles can be seen, look for the agility icon
             if agility:= imsearch.search_img_in_rect(agility_img, self.win.minimap):

@@ -57,13 +57,13 @@ class OSRSfletcher(OSRSBot):
         self.stop()
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   
 
     def craft(self, api_m: MorgHTTPSocket):
-        knife_img = imsearch.BOT_IMAGES.joinpath("items", "Knife.png") 
+        knife_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Knife.png") 
         slots = [1, 4] # This selection will click the 2nd and 3rd leather from the top. Adjust to your liking
         slot = random.choice(slots)
         if not api_m.get_is_inv_full(): # Fail-safe for when there's only a few leather left, logout and kill the script
@@ -90,7 +90,7 @@ class OSRSfletcher(OSRSBot):
         time.sleep(sleep_time)                                   
             
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        yew_logs_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Yew_logs_bank.png")
+        yew_logs_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Yew_logs_bank.png")
         while True:
             if yew_logs := imsearch.search_img_in_rect(yew_logs_bank_img, self.win.game_view):
                 self.mouse.move_to(yew_logs.random_point())

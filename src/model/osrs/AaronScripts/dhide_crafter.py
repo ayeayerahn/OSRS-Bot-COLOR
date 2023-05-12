@@ -57,13 +57,13 @@ class OSRSdhide_crafter(OSRSBot):
         self.stop()
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   
 
     def craft(self, api_m: MorgHTTPSocket):
-        needle_img = imsearch.BOT_IMAGES.joinpath("scraper", "Needle.png")
+        needle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Needle.png")
         slots = [2, 3] # This selection will click the 2nd and 3rd leather from the top. Adjust to your liking
         slot = random.choice(slots)
         if not api_m.get_is_inv_full(): # Fail-safe for when there's only a few leather left, logout and kill the script
@@ -106,7 +106,7 @@ class OSRSdhide_crafter(OSRSBot):
         time.sleep(sleep_time)                                 
             
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        leather_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Blue_dragon_leather_bank.png") # Specify which leather.png file to point to
+        leather_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Blue_dragon_leather_bank.png") # Specify which leather.png file to point to
         while True:
             if leather := imsearch.search_img_in_rect(leather_bank_img, self.win.game_view):
                 self.mouse.move_to(leather.random_point())

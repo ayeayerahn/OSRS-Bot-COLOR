@@ -60,7 +60,7 @@ class OSRSfiremaker(OSRSBot):
         self.stop()
 
     def firemake(self, api_m: MorgHTTPSocket):
-        logs_inventory_img = imsearch.BOT_IMAGES.joinpath("scraper", "Willow_logs.png")
+        logs_inventory_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Willow_logs.png")
         for logs in range(28):
             #if logs := imsearch.search_img_in_rect(logs_inventory_img, self.win.inventory_slots[logs]):
             if logs := api_m.get_inv_item_indices(ids.logs):
@@ -103,7 +103,7 @@ class OSRSfiremaker(OSRSBot):
         time.sleep(5)
 
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        logs_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Willow_logs_bank.png")
+        logs_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Willow_logs_bank.png")
         while True:
             if logs := imsearch.search_img_in_rect(logs_bank_img, self.win.game_view):
                 self.mouse.move_to(logs.random_point())

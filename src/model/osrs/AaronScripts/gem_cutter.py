@@ -63,7 +63,7 @@ class OSRSgem_cutter(OSRSBot):
         self.sleep(1,2)
     
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        uncut_sapphire_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Uncut_sapphire_bank.png")
+        uncut_sapphire_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Uncut_sapphire_bank.png")
         while True:
             if uncut_gem := imsearch.search_img_in_rect(uncut_sapphire_bank_img, self.win.game_view):
                 self.mouse.move_to(uncut_gem.random_point())
@@ -85,7 +85,7 @@ class OSRSgem_cutter(OSRSBot):
         time.sleep(sleep_time)    
 
     def craft(self, api_m: MorgHTTPSocket):
-        chisel_img = imsearch.BOT_IMAGES.joinpath("scraper", "Chisel.png") 
+        chisel_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Chisel.png") 
         slots = [1, 4]
         slot = random.choice(slots)
         if chisel := imsearch.search_img_in_rect(chisel_img, self.win.inventory_slots[0]):
@@ -98,7 +98,7 @@ class OSRSgem_cutter(OSRSBot):
                 pag.press('space')
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   

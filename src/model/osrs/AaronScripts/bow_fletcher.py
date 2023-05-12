@@ -56,13 +56,13 @@ class OSRSbow_fletcher(OSRSBot):
         self.stop()
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   
 
     def fletch_bow(self, api_m: MorgHTTPSocket):
-        bow_string_img = imsearch.BOT_IMAGES.joinpath("scraper", "Bow_string.png")
+        bow_string_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Bow_string.png")
         slots = [14, 17] # This selection will click the 2nd and 3rd leather from the top. Adjust to your liking
         slot = random.choice(slots)
         if not api_m.get_is_inv_full(): # Fail-safe for when there's only a few leather left, logout and kill the script
@@ -89,8 +89,8 @@ class OSRSbow_fletcher(OSRSBot):
         time.sleep(sleep_time)                                 
             
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        Bow_string_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Bow_string_bank.png")
-        Magic_longbow_u_img = imsearch.BOT_IMAGES.joinpath("scraper", "Magic_longbow_(u)_bank.png")
+        Bow_string_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Bow_string_bank.png")
+        Magic_longbow_u_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Magic_longbow_(u)_bank.png")
         while True:
             if bow_string := imsearch.search_img_in_rect(Bow_string_bank_img, self.win.game_view):
                 if Magic_longbow_u := imsearch.search_img_in_rect(Magic_longbow_u_img, self.win.game_view):

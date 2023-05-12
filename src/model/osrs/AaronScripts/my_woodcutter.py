@@ -120,7 +120,7 @@ class OSRSmyWoodcutter(OSRSBot):
         time.sleep(5)    
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.log_msg("Found the deposit img") 
             self.mouse.move_to(deposit.random_point())      
@@ -177,9 +177,15 @@ class OSRSmyWoodcutter(OSRSBot):
             return (self.choose_bank())
     
     def open_bank(self):
-         banker = self.get_all_tagged_in_rect(self.win.game_view, clr.PURPLE)  
-         self.mouse.move_to(banker.random_point())  
-         self.mouse.click()
+        banker = self.get_nearest_tag(clr.CYAN)
+        if not self.mouseover_text(contains="Bank"):
+            self.mouse.move_to(banker.random_point()) 
+        self.mouse.click()
+        self.sleep(1,2)
+                    #if not api_m.get_is_player_idle():
+                #self.sleep(1,7)
+                #self.mouse.move_to(banker.random_point(), mouseSpeed = "slow", knotsCount=2)
+                #self.sleep(10,15)
 
     def find_bank(self, deposit_slots):
         search_tries = 1
