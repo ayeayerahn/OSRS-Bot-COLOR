@@ -4,3 +4,5 @@ from .AaronScripts.agility import OSRSagility
 from .AaronScripts.alcher import OSRSalcher
 from .AaronScripts.dhide_crafter import OSRSdhide_crafter
 from .AaronScripts.powerminer import OSRSpowerminer
+from .AaronScripts.birdhouses import OSRSbirdhouses
+from .AaronScripts.ardyrooftops import OSRSardyrooftops
