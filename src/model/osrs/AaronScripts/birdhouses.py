@@ -222,6 +222,7 @@ class OSRSbirdhouses(OSRSBot):
         self.withdraw_seeds()
         time.sleep(0.5)
         pag.press('escape')
+        pag.press('escape')
 
     def birdhouse(self, api_m: MorgHTTPSocket):
         # Loot first birdhouse
