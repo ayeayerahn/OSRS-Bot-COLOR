@@ -140,7 +140,7 @@ class OSRSbirdhouses(OSRSBot):
     def crafting_cape_teleport(self):
         self.mouse.move_to(self.win.cp_tabs[4].random_point())
         self.mouse.click()
-        crafting_cape = imsearch.BOT_IMAGES.joinpath("scraper", "crafting_cape.png") 
+        crafting_cape = imsearch.BOT_IMAGES.joinpath("Aarons_images", "crafting_cape.png") 
         if cape := imsearch.search_img_in_rect(crafting_cape, self.win.control_panel):
             self.mouse.move_to(cape.random_point())
             self.mouse.click()
@@ -151,7 +151,7 @@ class OSRSbirdhouses(OSRSBot):
         time.sleep(sleep_time)   
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("scraper", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   
@@ -163,7 +163,7 @@ class OSRSbirdhouses(OSRSBot):
             self.mouse.click()    
     
     def withdraw_logs(self):
-        yew_logs_bank = imsearch.BOT_IMAGES.joinpath("scraper", "yew_logs_bank.png")
+        yew_logs_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "yew_logs_bank.png")
         if yew_logs := imsearch.search_img_in_rect(yew_logs_bank, self.win.game_view):
             self.mouse.move_to(yew_logs.random_point(), mouseSpeed = 'fastest')
             self.mouse.right_click()
@@ -174,21 +174,21 @@ class OSRSbirdhouses(OSRSBot):
             pag.press('enter')
     
     def withdraw_hammer(self):
-        hammer_bank = imsearch.BOT_IMAGES.joinpath("scraper", "hammer_bank.png")
+        hammer_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "hammer_bank.png")
         if hammer := imsearch.search_img_in_rect(hammer_bank, self.win.game_view):
             self.mouse.move_to(hammer.random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
             time.sleep(0.5)
 
     def withdraw_chisel(self):
-        chisel_bank = imsearch.BOT_IMAGES.joinpath("scraper", "chisel_bank.png")
+        chisel_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "chisel_bank.png")
         if chisel := imsearch.search_img_in_rect(chisel_bank, self.win.game_view):
             self.mouse.move_to(chisel.random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
             time.sleep(0.5)
 
     def withdraw_seeds(self):
-        seeds_bank = imsearch.BOT_IMAGES.joinpath("scraper", "Onion_seed_bank.png")
+        seeds_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Onion_seed_bank.png")
         if seeds := imsearch.search_img_in_rect(seeds_bank, self.win.game_view):
             self.mouse.move_to(seeds.random_point(), mouseSpeed = 'fastest')
             self.mouse.right_click()
@@ -200,14 +200,14 @@ class OSRSbirdhouses(OSRSBot):
             pag.press('enter') 
 
     def withdraw_birdhouse(self):
-        yew_birdhouse_bank = imsearch.BOT_IMAGES.joinpath("scraper", "yew_bird_house_bank.png")
+        yew_birdhouse_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "yew_bird_house_bank.png")
         if birdhouse := imsearch.search_img_in_rect(yew_birdhouse_bank, self.win.game_view):
             self.mouse.move_to(birdhouse.random_point(), mouseSpeed='fastest')
             self.mouse.click() 
             time.sleep(0.5)
     
     def withdraw_necklace(self):
-        digsite_neck_bank = imsearch.BOT_IMAGES.joinpath("scraper", "digsite_pendant_bank.png")
+        digsite_neck_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "digsite_pendant_bank.png")
         if digsite_neck := imsearch.search_img_in_rect(digsite_neck_bank, self.win.game_view):
             self.mouse.move_to(digsite_neck.random_point(), mouseSpeed='fastest')
             self.mouse.click() 

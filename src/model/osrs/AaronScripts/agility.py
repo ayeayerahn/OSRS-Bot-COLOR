@@ -86,7 +86,7 @@ class OSRSagility(OSRSBot):
 
     def return_to_start(self, api_m: MorgHTTPSocket):
         obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
-        agility_img = imsearch.BOT_IMAGES.joinpath("scraper", "ORukM7a97G.png")
+        agility_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ORukM7a97G.png")
         # If agility icon is found in minimap
         if agility:= imsearch.search_img_in_rect(agility_img, self.win.minimap):
             time.sleep(1)

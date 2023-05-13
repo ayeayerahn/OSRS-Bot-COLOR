@@ -75,7 +75,7 @@ class OSRSherb_cleaner(OSRSBot):
     
     def withdraw_herbs(self):
         # Locate herb of choice
-        grimy_harralander_bank_img = imsearch.BOT_IMAGES.joinpath("scraper", "Grimy_harralander_bank.png")
+        grimy_harralander_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Grimy_harralander_bank.png")
         # Click on herb in bank
         if grimy_herb := imsearch.search_img_in_rect(grimy_harralander_bank_img, self.win.game_view):
             self.mouse.move_to(grimy_herb.random_point())
@@ -111,7 +111,7 @@ class OSRSherb_cleaner(OSRSBot):
         self.click(slots)
 
     def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("items", "deposit.png") 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.log_msg("Found the deposit img") 
             self.mouse.move_to(deposit.random_point())   
