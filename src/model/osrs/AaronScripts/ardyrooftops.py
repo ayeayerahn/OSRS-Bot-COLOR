@@ -65,13 +65,13 @@ class OSRSardyrooftops(OSRSBot):
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
 
-            self.log_msg("Checking for marks")
+            #self.log_msg("Checking for marks")
             self.check_for_marks() # Check if marks of grace are visible on screen
 
-            self.log_msg("Checking for agility icon")
+            #self.log_msg("Checking for agility icon")
             self.return_to_start() # Check if Agility icon is visible
 
-            self.log_msg("Checking for green obstacles")
+            #self.log_msg("Checking for green obstacles")
             self.green_obstacle(api_m) # If neither of the above are true, find and click green obstacle
 
 
@@ -103,7 +103,7 @@ class OSRSardyrooftops(OSRSBot):
     def green_obstacle(self, api_m: MorgHTTPSocket):
         obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN) # Since we moved the camera, check again
         try: 
-            self.mouse.move_to(obstacle_tiles[0].random_point())
+            self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
         except: self.log_msg("Can't find a green obstacle")
         #self.mouse.click()
@@ -111,9 +111,10 @@ class OSRSardyrooftops(OSRSBot):
         self.sleep(0,1)
 
     def check_for_marks(self):
-        obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
+        #obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
         marks_of_grace = self.get_all_tagged_in_rect(self.win.game_view, clr.BLUE)
         while marks_of_grace:
+            obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
             self.log_msg("Found mark of grace.")
             time.sleep(1)
             if obstacle_tiles: # For the one time the bot sees a mark of grace on another platform before seeing the green tile in front of it
@@ -121,5 +122,5 @@ class OSRSardyrooftops(OSRSBot):
             self.mouse.move_to(marks_of_grace[0].random_point())
             if self.mouse.click(check_red_click=True):
                 self.log_msg("Successful click!")
-                time.sleep(1)
+                time.sleep(2)
                 break        
