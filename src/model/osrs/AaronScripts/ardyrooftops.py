@@ -119,7 +119,6 @@ class OSRSardyrooftops(OSRSBot):
             time.sleep(1)
             if obstacle_tiles: # For the one time the bot sees a mark of grace on another platform before seeing the green tile in front of it
                 break
-            marks_of_grace = self.get_all_tagged_in_rect(self.win.game_view, clr.BLUE)
             self.mouse.move_to(marks_of_grace[0].random_point())
             if self.mouse.click(check_red_click=True):
                 self.log_msg("Successful click!")
