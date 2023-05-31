@@ -53,10 +53,10 @@ DARK_YELLOW = Color([149, 146, 15])
 DARKER_YELLOW = Color([112, 110, 17])
 DARK_BLUE = Color([20, 95, 94])
 DARK_PURPLE = Color([106, 32, 110])
-LIGHT_PURPLE = Color([182, 149, 184])
+DARK_GREEN = Color([18, 234, 28])
 LIGHT_RED = Color([242, 125, 98])
-LIGHT_PURPLE = Color([96, 77, 239])
-MID_GREEN  = Color([27, 171, 49])
+LIGHT_PURPLE  = Color([74, 133, 245])
+TEXT_RED = Color([239,16,32])
 
 """Colors for use with semi-transparent text"""
 OFF_CYAN = Color([0, 200, 200], [70, 255, 255])
