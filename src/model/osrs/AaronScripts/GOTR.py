@@ -47,46 +47,13 @@ class OSRSGOTR(OSRSBot):
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
     #0. Start game
-            # self.log_msg("Waiting for new game to start..")
-            # while not self.chatbox_text_RED(contains="The rift becomes active!"):
-            #     time.sleep(1)
+    #1. Begin game
             self.activate_spec()
-    #1. Mine guardian remains
-            for i in range(2):
-                self.guardian_remains()
-    #2. Wait for and click special portal when it appears
-                self.special_portal(api_m)
-    #2a. Mine the rocks, when inventory is full, fill pouches
-                self.huge_guardian_remains(api_m)
-    #2c. mine rocks until inventory is full again then leave portal
-                self.special_portal(api_m)
-                time.sleep(3.5)
-    #3. Pick an altar to craft runes
-                self.choose_guardian(api_m)
-    #4. Craft runes
-                self.click_altar(api_m)
-    #5. Charge the guardian
-                self.power_up_guardian(api_m)
-    #6. Deposit runes
-                self.deposit_runes(api_m)
-    #7. Go to workbench to create more essence
-            self.gather_more_essence(api_m)
-            self.choose_guardian(api_m)
-            self.click_altar(api_m)
-            self.deposit_runes(api_m)
-            for i in range(2):
-                self.gather_more_essence(api_m)
-                self.power_up_guardian(api_m)
-                self.choose_guardian(api_m)
-                self.click_altar(api_m)
-                self.deposit_runes(api_m)
-            # Final sequence 
-            self.gather_more_essence(api_m)
-            self.power_up_guardian(api_m) 
-            self.choose_guardian(api_m)
-            self.click_altar(api_m)
-            self.power_up_guardian(api_m)
-            self.deposit_runes(api_m)
+            if api_m.get_inv_item_stack_amount(item_id=26878) < 43:
+                self.log_msg("Not enough guardian fragments.. starting the special portal sequence")
+                self.special_portal_sequence(api_m)
+            self.normal_sequence(api_m)
+            self.is_guardian_defeated()
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -94,29 +61,34 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("Finished.")
         self.stop()
 
-    def activate_spec(self):
-        spec_energy = self.get_special_energy()
-        if spec_energy >= 100:
-            self.mouse.move_to(self.win.spec_orb.random_point())
-            self.mouse.click()       
+    def is_guardian_defeated(self):
+        if self.chatbox_text_GREEN(contains="The Great Guardian successfully closed the rift"):
+            while not self.chatbox_text_RED(contains="The rift becomes active!"):
+                self.log_msg("Waiting for new game to start..")
+                time.sleep(1)
 
     def gather_more_essence(self, api_m:MorgHTTPSocket):
         workbench = self.get_nearest_tag(clr.DARK_PURPLE) # DARK_PURPLE = Color([106, 32, 110])
+        portal = self.get_nearest_tag(clr.CYAN)
         self.log_msg("Converting fragments to essence..")
+        if portal: # Check if portal has spawned
+            portal = self.get_nearest_tag(clr.CYAN)
         self.mouse.move_to(workbench.random_point())
         self.mouse.click()
         self.log_msg("Waiting until inventory is full..")
-        # while not api_m.get_is_inv_full():
-        #     time.sleep(1)
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
             time.sleep(1)
         self.fill_pouches(api_m)
-        workbench = self.get_nearest_tag(clr.DARK_PURPLE) # Call this again to recreate the rectangle from the original
-        self.mouse.move_to(workbench.random_point())
-        self.mouse.click()
-        # while not api_m.get_is_inv_full():
-        #     time.sleep(1)
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
+        while not portal: # Check if portal has spawned
+            workbench = self.get_nearest_tag(clr.DARK_PURPLE) # Call this again to recreate the rectangle from the original
+            self.mouse.move_to(workbench.random_point())
+            self.mouse.click()
+            while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
+                time.sleep(1)
+            break
+        self.huge_guardian_remains(api_m)
+        self.special_portal(api_m)
+        while not self.chatbox_text_BLACK(contains=f"You step through the portal and find yourself in another part of the temple"):
             time.sleep(1)
 
     def deposit_runes(self, api_m:MorgHTTPSocket):
@@ -135,12 +107,9 @@ class OSRSGOTR(OSRSBot):
         time.sleep(0.5)
 
     def power_up_guardian(self, api_m:MorgHTTPSocket):
-        self.log_msg("Heading to power up the guardian")
         power_up = self.get_nearest_tag(clr.DARKER_YELLOW)
-        # while not power_up:
-        #     power_up = self.get_nearest_tag(clr.DARKER_YELLOW)
-        #     time.sleep(1)
-        while not self.chatbox_text_BLACK(contains=f"You step through the portal and find yourself back in the temple"):
+        while not power_up:
+            power_up = self.get_nearest_tag(clr.DARKER_YELLOW)
             time.sleep(1)
         try:
             #power_up = self.get_nearest_tag(clr.DARKER_YELLOW) # DARKER_YELLOW = Color([112, 110, 17])
@@ -236,6 +205,7 @@ class OSRSGOTR(OSRSBot):
         self.mouse.click()
         self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
         self.mouse.click()
+        time.sleep(1)
         self.repair_pouches(api_m)
 
     def repair_pouches(self, api_m: MorgHTTPSocket):
@@ -337,6 +307,7 @@ class OSRSGOTR(OSRSBot):
             if self.chatbox_text_BLACK(contains=f"You step through the rift and find yourself at the {chosen_altar} Altar"):
                 chosen_altar = None
                 return self.choose_guardian(api_m)
+        
         self.log_msg(f"Going to {chosen_altar} altar")
         try:
             self.mouse.move_to(altar.random_point(), mouseSpeed = 'fastest')
@@ -355,6 +326,31 @@ class OSRSGOTR(OSRSBot):
                 break
         self.log_msg(f"Successfully entered the {chosen_altar} altar room!!")
 
+    def special_portal_sequence(self, api_m:MorgHTTPSocket):
+        self.guardian_remains()
+        self.special_portal(api_m)
+        self.huge_guardian_remains(api_m)
+        self.special_portal(api_m)
+        while not self.chatbox_text_BLACK(contains=f"You step through the portal and find yourself in another part of the temple"):
+            time.sleep(1)
+        self.choose_guardian(api_m)
+        self.click_altar(api_m)
+        self.power_up_guardian(api_m)
+        self.deposit_runes(api_m)
+
+    def normal_sequence(self, api_m:MorgHTTPSocket):
+        self.gather_more_essence(api_m)
+        self.choose_guardian(api_m)
+        self.click_altar(api_m)
+        self.power_up_guardian(api_m)
+        self.deposit_runes(api_m)   
+
+    def activate_spec(self):
+        spec_energy = self.get_special_energy()
+        if spec_energy >= 100:
+            self.mouse.move_to(self.win.spec_orb.random_point())
+            self.mouse.click()  
+
 """
         if rd.random_chance(probability=0.5):
             first_tile = self.get_nearest_tag(clr.LIGHT_PURPLE)
@@ -365,5 +361,43 @@ class OSRSGOTR(OSRSBot):
             second_tile = self.get_nearest_tag(clr.MID_GREEN)
             self.mouse.move_to(second_tile.random_point())
             self.mouse.click()
-            time.sleep(5)    
+            time.sleep(5)  
+
+        self.is_guardian_defeated(self)
+            for i in range(2):
+                self.guardian_remains()
+    #2. Wait for and click special portal when it appears
+                self.special_portal(api_m)
+    #2a. Mine the rocks, when inventory is full, fill pouches
+                self.huge_guardian_remains(api_m)
+    #2c. mine rocks until inventory is full again then leave portal
+                self.special_portal(api_m)
+                #time.sleep(3.5)
+    #3. Pick an altar to craft runes
+                self.choose_guardian(api_m)
+    #4. Craft runes
+                self.click_altar(api_m)
+    #5. Charge the guardian
+                self.power_up_guardian(api_m)
+    #6. Deposit runes
+                self.deposit_runes(api_m)
+    #7. Go to workbench to create more essence
+            self.gather_more_essence(api_m)
+            self.choose_guardian(api_m)
+            self.click_altar(api_m)
+            time.sleep(1)
+            self.deposit_runes(api_m)  
+            for i in range(2):
+                self.gather_more_essence(api_m)
+                self.power_up_guardian(api_m)
+                self.choose_guardian(api_m)
+                self.click_altar(api_m)
+                self.deposit_runes(api_m)
+            # Final sequence 
+            self.gather_more_essence(api_m)
+            self.power_up_guardian(api_m) 
+            self.choose_guardian(api_m)
+            self.click_altar(api_m)
+            self.power_up_guardian(api_m)
+            self.deposit_runes(api_m)
 """

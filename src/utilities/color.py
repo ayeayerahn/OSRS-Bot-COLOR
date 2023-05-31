@@ -57,6 +57,7 @@ DARK_GREEN = Color([18, 234, 28])
 LIGHT_RED = Color([242, 125, 98])
 LIGHT_PURPLE  = Color([74, 133, 245])
 TEXT_RED = Color([239,16,32])
+TEXT_GREEN = Color([0,95,0])
 
 """Colors for use with semi-transparent text"""
 OFF_CYAN = Color([0, 200, 200], [70, 255, 255])

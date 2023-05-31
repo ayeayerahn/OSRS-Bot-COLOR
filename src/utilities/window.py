@@ -45,6 +45,7 @@ class Window:
     # Chat Area
     chat: Rectangle = None  # https://i.imgur.com/u544ouI.png
     chat_tabs: List[Rectangle] = []  # https://i.imgur.com/2DH2SiL.png
+    chat_first_line: Rectangle = None
 
     # Minimap Area
     compass_orb: Rectangle = None
@@ -148,6 +149,7 @@ class Window:
             True if successful, False otherwise.
         """
         if chat := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("ui_templates", "chat.png"), client_rect):
+            self.chat_first_line = Rectangle(left=0 + chat.left, top=chat.top+102, width=chat.width, height=20)
             # Locate chat tabs
             self.chat_tabs = []
             x, y = 5, 143
