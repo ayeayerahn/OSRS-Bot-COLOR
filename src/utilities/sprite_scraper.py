@@ -1,5 +1,5 @@
 """
-This module contains the SpriteScraper class, which is used to download images from the OSRS Wiki.
+This module contains the SpriteScraper class, which is used to download images from the wiki API.
 If you are having issues, try disabling IPv6 on your machine.
 """
 
@@ -20,8 +20,6 @@ if __name__ == "__main__":
 
 import utilities.imagesearch as imsearch
 
-DEFAULT_DESTINATION = imsearch.BOT_IMAGES.joinpath("scraper")
-
 
 class ImageType(IntEnum):
     NORMAL = 0
@@ -32,6 +30,7 @@ class ImageType(IntEnum):
 class SpriteScraper:
     def __init__(self):
         self.BASE_URL = "https://oldschool.runescape.wiki/"
+        self.DEFAULT_DESTINATION = imsearch.BOT_IMAGES.joinpath("scraper")
 
     def search_and_download(self, search_string: str, **kwargs) -> Path:
         """
@@ -148,22 +147,21 @@ class SpriteScraper:
             tuple: A tuple containing image_type, destination, and notify_callback.
         """
         image_type = kwargs.get("image_type", ImageType.NORMAL)
-        destination = kwargs.get("destination", DEFAULT_DESTINATION)
+        destination = kwargs.get("destination", self.DEFAULT_DESTINATION)
         notify_callback = kwargs.get("notify_callback", print)
 
         if image_type not in iter(ImageType):
             notify_callback("Invalid image type argument. Assigning default value.\n")
             image_type = ImageType.NORMAL
 
-        return image_type, destination, notify_callback
+        return image_type, str(destination), notify_callback
 
     # -------------------
     # Subregion: API-Specific Methods
     # -------------------
     def __get_item_infobox_data(self, item: str) -> Optional[str]:
         """
-        Returns a string of data from the info box for a specific item from the Old School
-        RuneScape Wiki.
+        Returns a string of data from the info box for a specific item from the Wiki.
         Args:
             item: The item name.
         Returns:
@@ -305,7 +303,7 @@ if __name__ == "__main__":
     assert scraper._capitalize_each_word("claws_of_guthix") == "Claws_of_Guthix"
 
     # Test saving to non-existent directory in string format
-    new_destination = str(DEFAULT_DESTINATION.joinpath("lobster_stuff"))
+    new_destination = str(scraper.DEFAULT_DESTINATION.joinpath("lobster_stuff"))
     scraper.search_and_download(
         search_string=" lobster , lobster  Pot",
         image_type=ImageType.BANK,
