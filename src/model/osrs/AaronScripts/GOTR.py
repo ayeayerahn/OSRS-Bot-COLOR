@@ -67,23 +67,34 @@ class OSRSGOTR(OSRSBot):
 
     def is_guardian_defeated(self):
         if self.chatbox_text_GREEN(contains="The Great Guardian successfully closed the rift") or self.chatbox_text_RED(contains="defeated"):
-            time.sleep(3)
             self.log_msg("Game has ended.")
-            if orange_portal := self.get_nearest_tag(clr.ORANGE):
+            time.sleep(5)
+            return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
+            if return_to_start:
+                self.mouse.move_to(return_to_start.random_point())
+                self.mouse.click()
+                time.sleep(15)
+            elif orange_portal := self.get_nearest_tag(clr.ORANGE):
                 self.mouse.move_to(orange_portal.random_point())
                 self.mouse.click()
                 while not self.chatbox_text_BLACK(contains="You step through the portal and find yourself back in the temple"):
                     time.sleep(1)
-            if blue_portal := self.get_nearest_tag(clr.CYAN):
+                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
+                if return_to_start:
+                    self.mouse.move_to(return_to_start.random_point())
+                    self.mouse.click()
+                    time.sleep(15)
+            elif blue_portal := self.get_nearest_tag(clr.CYAN):
                 self.mouse.move_to(blue_portal.random_point())
                 self.mouse.click()
                 while not self.chatbox_text_BLACK('You step through the portal and find yourself in another part of the temple'):
                     time.sleep(1)
+                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
+                if return_to_start:
+                    self.mouse.move_to(return_to_start.random_point())
+                    self.mouse.click()
+                    time.sleep(15)
             time.sleep(3)
-            return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
-            self.mouse.move_to(return_to_start.random_point())
-            self.mouse.click()
-            time.sleep(15)
             top_rubble = self.get_nearest_tag(clr.RED)
             self.mouse.move_to(top_rubble.random_point())
             self.mouse.click()
@@ -112,6 +123,8 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("Waiting until inventory is full..")
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
             self.is_guardian_defeated()
+            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
+                break
             time.sleep(1)
         pag.press('space')
         self.fill_pouches(api_m)
@@ -120,6 +133,8 @@ class OSRSGOTR(OSRSBot):
         self.mouse.click()
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
             self.is_guardian_defeated()
+            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
+                break
             time.sleep(1)
         self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
@@ -129,6 +144,8 @@ class OSRSGOTR(OSRSBot):
         self.mouse.click()
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
             self.is_guardian_defeated()
+            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
+                break
             time.sleep(1)
         pag.press('space')
 
@@ -286,7 +303,7 @@ class OSRSGOTR(OSRSBot):
         self.mouse.click()
         self.log_msg("Heading to huge guardian remains")
         # Counter sequence in to break us out of this if we get stuck
-        while not self.chatbox_text_BLACK('You step through the portal and find yourself in another part of the temple'):
+        while not self.chatbox_text_BLACK_first_line('You step through the portal and find yourself in another part of the temple'):
             self.is_guardian_defeated()
             counter += 1
             time.sleep(1)
@@ -487,7 +504,7 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("Mining sequence")
         self.guardian_remains(api_m)
         self.activate_spec()
-        #time.sleep(80)
+        time.sleep(90)
         top_rubble = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(top_rubble.random_point())
         self.mouse.click()
