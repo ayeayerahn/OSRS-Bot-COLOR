@@ -47,8 +47,9 @@ class OSRSGOTR(OSRSBot):
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
             self.first_sequence(api_m)
-            for i in range(10):
-                self.normal_sequence(api_m)
+            self.normal_sequence(api_m)
+            
+                
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -61,12 +62,13 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("                                    First sequence")
         self.guardian_remains(api_m)
         self.activate_spec()
-        time.sleep(140)
+        time.sleep(136)
         top_rubble = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(top_rubble.random_point())
         self.mouse.click()
         time.sleep(6)
         self.return_to_start()
+        time.sleep(1)
         self.portal_sequence(api_m)
 
     def normal_sequence(self, api_m:MorgHTTPSocket):
@@ -75,15 +77,18 @@ class OSRSGOTR(OSRSBot):
         self.choose_guardian(api_m)
         self.click_altar(api_m)
         self.power_up_guardian(api_m)
-        self.deposit_runes(api_m)   
+        self.deposit_runes(api_m)
+        return self.normal_sequence(api_m)   
 
     def portal_sequence(self, api_m:MorgHTTPSocket):
+        self.log_msg("                                Portal sequence")
         self.blue_portal_sequence(api_m)
         #time.sleep(1)
         self.choose_guardian(api_m)
         self.click_altar(api_m)
         self.power_up_guardian(api_m) 
         self.deposit_runes(api_m)
+        self.log_msg("                          Returning to normal sequence")
         return self.normal_sequence(api_m)
 
     def power_up_guardian(self, api_m:MorgHTTPSocket):
@@ -100,6 +105,7 @@ class OSRSGOTR(OSRSBot):
             self.mouse.click()
             api_m.wait_til_gained_xp("Runecraft", 7)
             pag.press('space') # In case the game ends before we get to deposit the last batch
+            self.is_portal_active(api_m)
             self.is_guardian_defeated()
         except:
             AttributeError
@@ -109,15 +115,19 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("Heading to deposit runes")
         self.find_deposit()
         counter = 0 
-        while not self.chatbox_text_BLACK(contains=f"You deposit all of your runes into the pool"):
+        while not self.chatbox_text_BLACK_first_line(contains=f"You deposit all of your runes into the pool"):
             if self.chatbox_text_BLACK(contains="You have no runes to deposit into the pool"):
+                self.log_msg("You had no runes to deposit")
                 break
+            self.log_msg("Looking for successful deposit message")
             self.is_guardian_defeated()
             counter += 1
             time.sleep(1)
-            if counter == 15:
-                return self.get_essence_workbench(api_m)
+            if counter == 8:
+                self.log_msg("Counter reached 15, returning to get_essence_workbench function")
+                return self.normal_sequence(api_m)
         time.sleep(0.5)
+        self.is_portal_active(api_m)
 
     def huge_guardian_remains(self, api_m:MorgHTTPSocket):
         self.is_guardian_defeated()
@@ -211,11 +221,15 @@ class OSRSGOTR(OSRSBot):
         portal = self.get_nearest_tag(clr.CYAN)
         self.log_msg("Waiting for portal to appear.")
         # Constantly check for blue portal to spawn
+        counter = 0
         while not portal:
             portal = self.get_nearest_tag(clr.CYAN)
             self.activate_spec()
             self.is_guardian_defeated()
+            counter += 1
             time.sleep(1)
+            if counter == 30:
+                return self.normal_sequence(api_m)
         self.mouse.move_to(portal.random_point())
         # This sequence is for the blue portal that spawns on the east side
         if self.chatbox_text_RED(contains='A portal to the huge guardian fragment mine has opened to the east!'):
@@ -340,13 +354,14 @@ class OSRSGOTR(OSRSBot):
                 self.choose_guardian(api_m)
                 break
         self.log_msg(f"Successfully entered the {chosen_altar} altar room!!")
-
+ 
 # Mini-sequences
     def get_essence_workbench(self, api_m:MorgHTTPSocket):
         self.check_chatbox_guardian_fragment()
         self.is_guardian_defeated()
         self.log_msg("Waiting until inventory is full..")
         self.work_at_bench()
+        api_m.wait_til_gained_xp("Crafting", 5)
         self.workbench_is_inv_full(api_m)
         pag.press('space')
         self.fill_pouches(api_m)
