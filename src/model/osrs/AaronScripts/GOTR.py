@@ -46,129 +46,45 @@ class OSRSGOTR(OSRSBot):
         while time.time() - start_time < end_time:
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
-    #0. Start game
-    #1. Begin game
-            #self.is_guardian_active()
-            #guardian_fragments = api_m.get_inv_item_stack_amount(ids.GUARDIAN_FRAGMENTS)
-            #if guardian_fragments > 43:
-            self.mining_sequence(api_m)
+            self.first_sequence(api_m)
             for i in range(10):
                 self.normal_sequence(api_m)
-                self.first_sequence(api_m)
-            # if guardian_fragments < 43:
-            #     self.log_msg("Not enough guardian fragments.. starting the special portal sequence")
-            #     #self.mining_sequence(api_m)
 
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
+# Full sequences
 
-    def is_guardian_defeated(self):
-        if self.chatbox_text_GREEN(contains="The Great Guardian successfully closed the rift") or self.chatbox_text_RED(contains="defeated"):
-            self.log_msg("Game has ended.")
-            time.sleep(5)
-            return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
-            if return_to_start:
-                self.mouse.move_to(return_to_start.random_point())
-                self.mouse.click()
-                time.sleep(15)
-            elif orange_portal := self.get_nearest_tag(clr.ORANGE):
-                self.mouse.move_to(orange_portal.random_point())
-                self.mouse.click()
-                while not self.chatbox_text_BLACK(contains="You step through the portal and find yourself back in the temple"):
-                    time.sleep(1)
-                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
-                if return_to_start:
-                    self.mouse.move_to(return_to_start.random_point())
-                    self.mouse.click()
-                    time.sleep(15)
-            elif blue_portal := self.get_nearest_tag(clr.CYAN):
-                self.mouse.move_to(blue_portal.random_point())
-                self.mouse.click()
-                while not self.chatbox_text_BLACK('You step through the portal and find yourself in another part of the temple'):
-                    time.sleep(1)
-                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
-                if return_to_start:
-                    self.mouse.move_to(return_to_start.random_point())
-                    self.mouse.click()
-                    time.sleep(15)
-            time.sleep(3)
-            top_rubble = self.get_nearest_tag(clr.RED)
-            self.mouse.move_to(top_rubble.random_point())
-            self.mouse.click()
-            time.sleep(10)
-            self.is_guardian_active()
-            return self.main_loop()
-
-
-    def is_guardian_active(self):
-        while not self.chatbox_text_RED(contains="The rift becomes active!"):
-            self.log_msg("Waiting for new game to start..")
-            if orange_portal := self.get_nearest_tag(clr.ORANGE):
-                self.mouse.move_to(orange_portal.random_point())
-                self.mouse.click()
-            time.sleep(1)
-
-    def gather_more_essence(self, api_m:MorgHTTPSocket):
-        if self.chatbox_text_QUEST("You'll need at least one guardian fragment to craft guardian essence."):
-            time.sleep(1)
-            pag.press('space')
-        self.is_guardian_defeated()
-        workbench = self.get_nearest_tag(clr.DARK_PURPLE) # DARK_PURPLE = Color([106, 32, 110])
-        self.log_msg("Converting fragments to essence..")
-        self.mouse.move_to(workbench.random_point())
+    def first_sequence(self, api_m:MorgHTTPSocket):
+        self.log_msg("                                    First sequence")
+        self.guardian_remains(api_m)
+        self.activate_spec()
+        time.sleep(140)
+        top_rubble = self.get_nearest_tag(clr.RED)
+        self.mouse.move_to(top_rubble.random_point())
         self.mouse.click()
-        self.log_msg("Waiting until inventory is full..")
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
-            self.is_guardian_defeated()
-            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
-                break
-            time.sleep(1)
-        pag.press('space')
-        self.fill_pouches(api_m)
-        workbench = self.get_nearest_tag(clr.DARK_PURPLE) # Call this again to recreate the rectangle from the original
-        self.mouse.move_to(workbench.random_point())
-        self.mouse.click()
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
-            self.is_guardian_defeated()
-            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
-                break
-            time.sleep(1)
-        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        time.sleep(1)
-        self.repair_pouches(api_m)
-        self.mouse.move_to(workbench.random_point())
-        self.mouse.click()
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
-            self.is_guardian_defeated()
-            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
-                break
-            time.sleep(1)
-        pag.press('space')
+        time.sleep(6)
+        self.return_to_start()
+        self.portal_sequence(api_m)
 
-    def deposit_runes(self):
-        self.is_guardian_defeated()
-        self.log_msg("Heading to deposit runes")
-        deposit = self.get_nearest_tag(clr.DARK_BLUE)
-        try:
-            deposit = self.get_nearest_tag(clr.DARK_BLUE) # DARK_BLUE = Color([20, 95, 94])
-            self.mouse.move_to(deposit.random_point())
-            self.mouse.click()
-        except:
-            AttributeError
-        counter = 0 
-        while not self.chatbox_text_BLACK_first_line(contains=f"You deposit all of your runes into the pool"):
-            if self.chatbox_text_BLACK_first_line(contains="You have no runs to deposit into the pool"):
-                break
-            self.is_guardian_defeated()
-            counter += 1
-            time.sleep(1)
-            if counter == 15:
-                return self.deposit_runes()
-        time.sleep(0.5)
+    def normal_sequence(self, api_m:MorgHTTPSocket):
+        self.log_msg("                                    Gather sequence")
+        self.get_essence_workbench(api_m)
+        self.choose_guardian(api_m)
+        self.click_altar(api_m)
+        self.power_up_guardian(api_m)
+        self.deposit_runes(api_m)   
+
+    def portal_sequence(self, api_m:MorgHTTPSocket):
+        self.blue_portal_sequence(api_m)
+        #time.sleep(1)
+        self.choose_guardian(api_m)
+        self.click_altar(api_m)
+        self.power_up_guardian(api_m) 
+        self.deposit_runes(api_m)
+        return self.normal_sequence(api_m)
 
     def power_up_guardian(self, api_m:MorgHTTPSocket):
         self.is_guardian_defeated()
@@ -182,11 +98,26 @@ class OSRSGOTR(OSRSBot):
             self.log_msg("Powering up the guardian..")
             self.mouse.move_to(power_up.random_point())
             self.mouse.click()
-            api_m.wait_til_gained_xp("Runecraft", 10)
+            api_m.wait_til_gained_xp("Runecraft", 7)
             pag.press('space') # In case the game ends before we get to deposit the last batch
             self.is_guardian_defeated()
         except:
             AttributeError
+
+    def deposit_runes(self, api_m:MorgHTTPSocket):
+        self.is_guardian_defeated()
+        self.log_msg("Heading to deposit runes")
+        self.find_deposit()
+        counter = 0 
+        while not self.chatbox_text_BLACK(contains=f"You deposit all of your runes into the pool"):
+            if self.chatbox_text_BLACK(contains="You have no runes to deposit into the pool"):
+                break
+            self.is_guardian_defeated()
+            counter += 1
+            time.sleep(1)
+            if counter == 15:
+                return self.get_essence_workbench(api_m)
+        time.sleep(0.5)
 
     def huge_guardian_remains(self, api_m:MorgHTTPSocket):
         self.is_guardian_defeated()
@@ -216,15 +147,6 @@ class OSRSGOTR(OSRSBot):
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
             self.is_guardian_defeated()
             time.sleep(1)
-
-    def guardian_remains(self, api_m: MorgHTTPSocket):
-        self.is_guardian_defeated()
-        self.log_msg("Mining guardian fragments")
-        remains = self.get_nearest_tag(clr.YELLOW)
-        self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
-        self.mouse.click()
-        api_m.wait_til_gained_xp('Mining', 10)
-        self.is_guardian_defeated()
 
     def click_altar(self, api_m: MorgHTTPSocket):
         altar = self.get_nearest_tag(clr.GREEN)
@@ -283,8 +205,8 @@ class OSRSGOTR(OSRSBot):
                 return self.normal_sequence(api_m)
     
     def blue_portal_sequence(self, api_m:MorgHTTPSocket):
+        self.log_msg("                                 Blue portal sequence")
         # Loop to locate blue portal
-        counter = 0
         self.is_guardian_defeated()
         portal = self.get_nearest_tag(clr.CYAN)
         self.log_msg("Waiting for portal to appear.")
@@ -302,107 +224,35 @@ class OSRSGOTR(OSRSBot):
                 self.mouse.move_to(enter_text[0].random_point(), knotsCount=0)
         self.mouse.click()
         self.log_msg("Heading to huge guardian remains")
-        # Counter sequence in to break us out of this if we get stuck
-        while not self.chatbox_text_BLACK_first_line('You step through the portal and find yourself in another part of the temple'):
-            self.is_guardian_defeated()
-            counter += 1
-            time.sleep(1)
-            if counter == 15:
-                return self.normal_sequence(api_m)
+        # Counter sequence to break us out of this if we get stuck
+        self.check_chatbox_blue_portal(api_m)
         # Mine huge guardian essence
         remains = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
-            self.is_guardian_defeated()
-            time.sleep(1)
+        # Check if inventory is full
+        self.huge_guardian_remains_is_inv_full()
         self.fill_pouches(api_m)
         remains = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
-            self.is_guardian_defeated()
-            time.sleep(1)
+        # Check if inventory is full
+        self.huge_guardian_remains_is_inv_full()
         self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
         time.sleep(1)
         self.repair_pouches(api_m)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
-        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
-            self.is_guardian_defeated()
-            time.sleep(1)
+        # Check if inventory is full
+        self.huge_guardian_remains_is_inv_full()
         # Return to the main area via blue portal
-        counter = 0
         portal = self.get_nearest_tag(clr.CYAN)
         self.log_msg("Returning to main area...")
         self.mouse.move_to(portal.random_point())
         self.mouse.click()
-        while not self.chatbox_text_BLACK('You step through the portal and find yourself in another part of the temple'):
-            self.is_guardian_defeated()
-            time.sleep(1)
-
-    def empty_pouches(self): #Need to add proper checks for when the pouches become damaged
-        pag.keyDown('shift')
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
-        self.mouse.click()
-        pag.keyUp('shift')
-
-    def fill_pouches(self, api_m: MorgHTTPSocket): #Need to add proper checks for when the pouches become damaged
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
-        self.mouse.click()
         time.sleep(1)
-        self.repair_pouches(api_m)
-
-    def repair_pouches(self, api_m: MorgHTTPSocket):
-        large_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "large_pouch.png")
-        giant_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "giant_pouch.png")
-        large_rune_pouch = imsearch.search_img_in_rect(large_rune_pouch_img, self.win.inventory_slots[2])
-        giant_rune_pouch = imsearch.search_img_in_rect(giant_rune_pouch_img, self.win.inventory_slots[3])
-        if not large_rune_pouch or not giant_rune_pouch:
-            spellbook_tab = self.win.cp_tabs[6]
-            self.mouse.move_to(spellbook_tab.random_point())
-            self.mouse.click()
-            npc_contact_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "npc_contact_on.png")
-            npc_contact = imsearch.search_img_in_rect(npc_contact_img, self.win.control_panel)
-            self.mouse.move_to(npc_contact.random_point())
-            self.mouse.click()
-            time.sleep(1)
-            dark_mage_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "npc_contact_darkmage.png")
-            dark_mage = imsearch.search_img_in_rect(dark_mage_img, self.win.game_view)
-            self.mouse.move_to(dark_mage.random_point())
-            self.mouse.click()
-            api_m.wait_til_gained_xp('Magic', 10)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('2')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('2')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('2')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            self.mouse.move_to(self.win.cp_tabs[3].random_point())
-            self.mouse.click()
-            time.sleep(1)
-
+        self.check_chatbox_blue_portal(api_m)
 
     def choose_guardian(self, api_m: MorgHTTPSocket):
         self.is_guardian_defeated()
@@ -491,52 +341,218 @@ class OSRSGOTR(OSRSBot):
                 break
         self.log_msg(f"Successfully entered the {chosen_altar} altar room!!")
 
-    def first_sequence(self, api_m:MorgHTTPSocket):
-        self.log_msg("Special portal sequence")
-        self.guardian_remains(api_m)
-        self.blue_portal_sequence(api_m)
-        self.choose_guardian(api_m)
-        self.click_altar(api_m)
-        self.power_up_guardian(api_m)
-        self.deposit_runes()
-
-    def mining_sequence(self, api_m:MorgHTTPSocket):
-        self.log_msg("Mining sequence")
-        self.guardian_remains(api_m)
-        self.activate_spec()
-        time.sleep(90)
-        top_rubble = self.get_nearest_tag(clr.RED)
-        self.mouse.move_to(top_rubble.random_point())
+# Mini-sequences
+    def get_essence_workbench(self, api_m:MorgHTTPSocket):
+        self.check_chatbox_guardian_fragment()
+        self.is_guardian_defeated()
+        self.log_msg("Waiting until inventory is full..")
+        self.work_at_bench()
+        self.workbench_is_inv_full(api_m)
+        pag.press('space')
+        self.fill_pouches(api_m)
+        self.log_msg("Waiting until inventory is full #2..")
+        self.work_at_bench()
+        self.workbench_is_inv_full(api_m)
+        pag.press('space')
+        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # fill giant pouch
         self.mouse.click()
-        time.sleep(5)
-        self.gather_more_essence(api_m)
-        self.choose_guardian(api_m)
-        self.click_altar(api_m)
-        self.power_up_guardian(api_m)
-        self.deposit_runes() 
+        time.sleep(1)
+        self.repair_pouches(api_m)
+        self.log_msg("Waiting until inventory is full #3..")
+        self.work_at_bench()
+        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
+            self.is_guardian_defeated()
+            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
+                break
+            time.sleep(1)
+        pag.press('space')
 
-    def portal_sequence(self, api_m:MorgHTTPSocket):
-        self.blue_portal_sequence(api_m)
-        self.choose_guardian(api_m)
-        self.click_altar(api_m)
-        self.power_up_guardian(api_m) 
-
-    def normal_sequence(self, api_m:MorgHTTPSocket):
-        self.gather_more_essence(api_m)
-        self.choose_guardian(api_m)
-        self.click_altar(api_m)
-        self.power_up_guardian(api_m)
+# Check functions
+    def is_portal_active(self, api_m:MorgHTTPSocket):
         portal = self.get_nearest_tag(clr.CYAN)
         if portal:
             portal = self.get_nearest_tag(clr.CYAN)
-            self.portal_sequence(api_m)
-        self.deposit_runes()   
+            return self.portal_sequence(api_m)
 
+    def workbench_is_inv_full(self, api_m:MorgHTTPSocket):
+        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
+            self.is_portal_active(api_m)
+            self.is_guardian_defeated()
+            if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
+                break
+            time.sleep(1)
+
+    def huge_guardian_remains_is_inv_full(self):
+        while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
+            self.is_guardian_defeated()
+            time.sleep(1)
+
+    def is_guardian_active(self):
+        while not self.chatbox_text_RED(contains="The rift becomes active!"):
+            self.log_msg("Waiting for new game to start..")
+            if orange_portal := self.get_nearest_tag(clr.ORANGE):
+                self.mouse.move_to(orange_portal.random_point())
+                self.mouse.click()
+            time.sleep(1)
+
+    def is_guardian_defeated(self):
+        orange_portal = self.get_nearest_tag(clr.ORANGE)
+        blue_portal = self.get_nearest_tag(clr.CYAN)
+        if self.chatbox_text_GREEN(contains="The Great Guardian successfully closed the rift") or self.chatbox_text_RED(contains="defeated"):
+            self.log_msg("Game has ended.")
+            time.sleep(5)
+            if return_to_start := self.get_nearest_tag(clr.DARKER_GREEN):
+                self.return_to_start()
+                time.sleep(15) 
+                orange_portal = self.get_nearest_tag(clr.ORANGE)
+                blue_portal = self.get_nearest_tag(clr.CYAN)
+            elif orange_portal:
+                self.orange_portal()
+                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
+                if return_to_start:
+                    self.return_to_start()
+            elif blue_portal:
+                self.blue_portal()
+                return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
+                if return_to_start:
+                    self.return_to_start()
+                    time.sleep(15)
+            time.sleep(3)
+            self.top_rubble()
+            time.sleep(10)
+            self.is_guardian_active()
+            return self.main_loop()
+
+    def check_chatbox_guardian_fragment(self):
+        while self.chatbox_text_QUEST("You'll need at least one guardian fragment to craft guardian essence."):
+            time.sleep(1)
+            pag.press('space')
+
+    def check_chatbox_blue_portal(self, api_m:MorgHTTPSocket):
+        counter = 0
+        self.log_msg("Checking chat for 'another part of the temple' after clicking blue portal")
+        while not self.chatbox_text_BLACK_first_line('You step through the portal and find yourself in another part of the temple'):
+            self.is_guardian_defeated()
+            counter += 1
+            time.sleep(1)
+            if counter == 15:
+                self.log_msg("Returning to normal sequence")
+                return self.normal_sequence(api_m)
+
+# Smaller functions
     def activate_spec(self):
         spec_energy = self.get_special_energy()
         if spec_energy >= 100:
             self.mouse.move_to(self.win.spec_orb.random_point())
             self.mouse.click()  
+
+    def fill_pouches(self, api_m: MorgHTTPSocket):
+        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
+        self.mouse.click()
+        #time.sleep(1)
+        #self.repair_pouches(api_m)
+
+    def empty_pouches(self):
+        pag.keyDown('shift')
+        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
+        self.mouse.click()
+        pag.keyUp('shift')
+
+    def repair_pouches(self, api_m: MorgHTTPSocket):
+        large_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "large_pouch.png")
+        giant_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "giant_pouch.png")
+        large_rune_pouch = imsearch.search_img_in_rect(large_rune_pouch_img, self.win.inventory_slots[2])
+        giant_rune_pouch = imsearch.search_img_in_rect(giant_rune_pouch_img, self.win.inventory_slots[3])
+        if not large_rune_pouch or not giant_rune_pouch:
+            spellbook_tab = self.win.cp_tabs[6]
+            self.mouse.move_to(spellbook_tab.random_point())
+            self.mouse.click()
+            npc_contact_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "npc_contact_on.png")
+            npc_contact = imsearch.search_img_in_rect(npc_contact_img, self.win.control_panel)
+            self.mouse.move_to(npc_contact.random_point())
+            self.mouse.click()
+            time.sleep(1)
+            dark_mage_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "npc_contact_darkmage.png")
+            dark_mage = imsearch.search_img_in_rect(dark_mage_img, self.win.game_view)
+            self.mouse.move_to(dark_mage.random_point())
+            self.mouse.click()
+            api_m.wait_til_gained_xp('Magic', 10)
+            pag.press('space')
+            time.sleep(1)
+            pag.press('2')
+            time.sleep(1)
+            pag.press('space')
+            time.sleep(1)
+            pag.press('2')
+            time.sleep(1)
+            pag.press('space')
+            time.sleep(1)
+            pag.press('space')
+            time.sleep(1)
+            pag.press('2')
+            time.sleep(1)
+            pag.press('space')
+            time.sleep(1)
+            pag.press('space')
+            time.sleep(1)
+            self.mouse.move_to(self.win.cp_tabs[3].random_point())
+            self.mouse.click()
+            time.sleep(1)
+
+    def find_deposit(self):
+        if deposit := self.get_nearest_tag(clr.DARK_BLUE): # DARK_BLUE = Color([20, 95, 94])
+            self.mouse.move_to(deposit.random_point())
+            self.mouse.click()
+
+    def work_at_bench(self):
+        workbench = self.get_nearest_tag(clr.DARK_PURPLE) # DARK_PURPLE = Color([106, 32, 110])
+        self.log_msg("Converting fragments to essence..")
+        self.mouse.move_to(workbench.random_point())
+        self.mouse.click()
+
+    def guardian_remains(self, api_m: MorgHTTPSocket):
+        self.is_guardian_defeated()
+        self.log_msg("Mining guardian fragments")
+        remains = self.get_nearest_tag(clr.YELLOW)
+        self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
+        self.mouse.click()
+        api_m.wait_til_gained_xp('Mining', 10)
+        self.is_guardian_defeated()
+
+    def return_to_start(self):
+        if return_to_start := self.get_nearest_tag(clr.DARKER_GREEN):
+            self.mouse.move_to(return_to_start.random_point())
+            self.mouse.click() 
+
+    def orange_portal(self):
+        if orange_portal := self.get_nearest_tag(clr.ORANGE):
+            self.mouse.move_to(orange_portal.random_point())
+            self.mouse.click()
+            while not self.chatbox_text_BLACK(contains="You step through the portal and find yourself back in the temple"):
+                time.sleep(1)
+
+    def blue_portal(self):
+        if blue_portal := self.get_nearest_tag(clr.CYAN):
+            self.mouse.move_to(blue_portal.random_point())
+            self.mouse.click()
+            while not self.chatbox_text_BLACK('You step through the portal and find yourself in another part of the temple'):
+                time.sleep(1)
+
+    def top_rubble(self):
+        top_rubble = self.get_nearest_tag(clr.RED)
+        self.mouse.move_to(top_rubble.random_point())
+        self.mouse.click()
+
+
+
 
 """
         if rd.random_chance(probability=0.5):
@@ -550,3 +566,4 @@ class OSRSGOTR(OSRSBot):
             self.mouse.click()
             time.sleep(5)  
 """
+
