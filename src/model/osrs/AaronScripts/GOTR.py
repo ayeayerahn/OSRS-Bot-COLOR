@@ -411,23 +411,25 @@ class OSRSGOTR(OSRSBot):
             time.sleep(1)
 
     def is_guardian_defeated(self):
-        orange_portal = self.get_nearest_tag(clr.ORANGE)
-        blue_portal = self.get_nearest_tag(clr.CYAN)
         if self.chatbox_text_GREEN(contains="The Great Guardian successfully closed the rift") or self.chatbox_text_RED(contains="defeated"):
             self.log_msg("Game has ended.")
-            time.sleep(5)
+            time.sleep(10)
+            orange_portal = self.get_nearest_tag(clr.ORANGE)
+            blue_portal = self.get_nearest_tag(clr.CYAN)
             if return_to_start := self.get_nearest_tag(clr.DARKER_GREEN):
                 self.return_to_start()
-                time.sleep(15) 
+                time.sleep(10) 
                 orange_portal = self.get_nearest_tag(clr.ORANGE)
                 blue_portal = self.get_nearest_tag(clr.CYAN)
             elif orange_portal:
                 self.orange_portal()
+                time.sleep(5)
                 return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
                 if return_to_start:
                     self.return_to_start()
             elif blue_portal:
                 self.blue_portal()
+                time.sleep(5)
                 return_to_start = self.get_nearest_tag(clr.DARKER_GREEN)
                 if return_to_start:
                     self.return_to_start()
