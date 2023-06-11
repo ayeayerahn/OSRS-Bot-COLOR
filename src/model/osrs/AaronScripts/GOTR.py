@@ -17,7 +17,7 @@ class OSRSGOTR(OSRSBot):
         description = "<Bot description here.>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 100
+        self.running_time = 1
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -300,18 +300,6 @@ class OSRSGOTR(OSRSBot):
         if law_pillar:
             altar = self.get_nearest_tag(clr.LIGHT_PURPLE)
             chosen_altar = 'Law'    
-        elif chaos_pillar:
-            altar = self.get_nearest_tag(clr.LIGHT_BROWN)
-            chosen_altar = 'Chaos'
-        elif nature_pillar:
-            altar = self.get_nearest_tag(clr.DARK_GREEN)
-            chosen_altar = 'Nature'
-        elif cosmic_pillar:
-            altar = self.get_nearest_tag(clr.LIGHT_RED)
-            chosen_altar = 'Cosmic'
-        elif body_pillar:
-            altar = self.get_nearest_tag(clr.LIGHT_CYAN)
-            chosen_altar = 'Body'
         elif mind_pillar:
             altar = self.get_nearest_tag(clr.DARK_ORANGE)
             chosen_altar = 'Mind'
@@ -327,6 +315,18 @@ class OSRSGOTR(OSRSBot):
         elif fire_pillar:
             altar = self.get_nearest_tag(clr.PINK)
             chosen_altar = 'Fire'
+        elif chaos_pillar:
+            altar = self.get_nearest_tag(clr.LIGHT_BROWN)
+            chosen_altar = 'Chaos'
+        elif nature_pillar:
+            altar = self.get_nearest_tag(clr.DARK_GREEN)
+            chosen_altar = 'Nature'
+        elif cosmic_pillar:
+            altar = self.get_nearest_tag(clr.LIGHT_RED)
+            chosen_altar = 'Cosmic'
+        elif body_pillar:
+            altar = self.get_nearest_tag(clr.LIGHT_CYAN)
+            chosen_altar = 'Body'
             
         try:
             if self.chatbox_text_BLACK_first_line(contains=f"You step through the rift and find yourself at the {chosen_altar} Altar"):
@@ -484,11 +484,9 @@ class OSRSGOTR(OSRSBot):
         pag.keyUp('shift')
 
     def repair_pouches(self, api_m: MorgHTTPSocket):
-        large_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "large_pouch.png")
         giant_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "giant_pouch.png")
-        large_rune_pouch = imsearch.search_img_in_rect(large_rune_pouch_img, self.win.inventory_slots[2])
-        giant_rune_pouch = imsearch.search_img_in_rect(giant_rune_pouch_img, self.win.inventory_slots[3])
-        if not large_rune_pouch or not giant_rune_pouch:
+        giant_rune_pouch = imsearch.search_img_in_rect(giant_rune_pouch_img, self.win.inventory_slots[4])
+        if not giant_rune_pouch:
             spellbook_tab = self.win.cp_tabs[6]
             self.mouse.move_to(spellbook_tab.random_point())
             self.mouse.click()
