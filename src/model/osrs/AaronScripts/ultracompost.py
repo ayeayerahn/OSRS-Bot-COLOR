@@ -1,8 +1,5 @@
 import time
-import random
-
 import utilities.color as clr
-import utilities.api.item_ids as ids
 import utilities.random_util as rd
 import utilities.imagesearch as imsearch
 import pyautogui as pag
@@ -10,10 +7,10 @@ from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 
 
-class OSRSdhide_crafter(OSRSBot):
+class OSRSultracompost(OSRSBot):
     def __init__(self):
-        bot_title = "Dhide Crafter"
-        description = "This bot will craft dragonhide bodies."
+        bot_title = "Ultracompost maker"
+        description = "This bot will make ultracompost."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
         self.running_time = 360
@@ -38,7 +35,6 @@ class OSRSdhide_crafter(OSRSBot):
     def main_loop(self):
         # Setup APIs
         api_m = MorgHTTPSocket()
-        #api_s = StatusSocket()
 
         # Main loop
         start_time = time.time()
@@ -48,8 +44,8 @@ class OSRSdhide_crafter(OSRSBot):
             self.open_bank()
             self.deposit_all()
             self.withdraw_supplies(api_m)
-            self.craft(api_m)
-            self.hover_banker(api_m)
+            self.make_compost()
+            time.sleep(35)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -63,32 +59,13 @@ class OSRSdhide_crafter(OSRSBot):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()   
 
-    def craft(self, api_m: MorgHTTPSocket):
-        needle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Needle.png")
-        slots = [2, 3] # This selection will click the 2nd and 3rd leather from the top. Adjust to your liking
-        slot = random.choice(slots)
-        if not api_m.get_is_inv_full(): # Fail-safe for when there's only a few leather left, logout and kill the script
-            self.logout()
-            self.stop()
-        if needle := imsearch.search_img_in_rect(needle_img, self.win.inventory_slots[0]):
-            if leather := api_m.get_inv_item_indices(ids.leathers):
-                self.mouse.move_to(needle.random_point())
-                self.mouse.click()
-                self.mouse.move_to(self.win.inventory_slots[leather[slot]].random_point())
-                self.mouse.click()
-                self.sleep(0.8, 2)
-                pag.press('space')
-
-    def hover_banker(self, api_m: MorgHTTPSocket):
-        banker = self.get_nearest_tag(clr.CYAN)
-        self.sleep(3,7)
-        self.mouse.move_to(banker.random_point(), mouseSpeed = "medium", knotsCount=2)
-        while True:
-            try:
-                if api_m.get_is_player_idle(poll_seconds=2):
-                    break
-            except:
-                time.sleep(5)
+    def make_compost(self):
+        self.mouse.move_to(self.win.inventory_slots[0].random_point())
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[4].random_point())
+        self.mouse.click()
+        self.sleep(0.8, 2)
+        pag.press('space')
     
     def open_bank(self):
         banker = self.get_nearest_tag(clr.CYAN)
@@ -103,18 +80,16 @@ class OSRSdhide_crafter(OSRSBot):
         time.sleep(sleep_time)                                 
             
     def withdraw_supplies(self, api_m: MorgHTTPSocket):
-        leather_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Blue_dragon_leather_bank.png") # Specify which leather.png file to point to
-        while True:
-            if leather := imsearch.search_img_in_rect(leather_bank_img, self.win.game_view):
-                self.mouse.move_to(leather.random_point())
-                self.mouse.click()
-                self.sleep(1,2)
-            if not api_m.get_is_inv_full(): # Log out if no supplies are found
-                self.log_msg("No more supplies. Logging out.")
-                pag.press('escape')
-                self.logout()
-                self.stop()
-            else:
-                pag.press('escape')
-                self.sleep(0.5, 1)
-                break
+        super_compost_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Supercompost_bank.png") # Specify which leather.png file to point to
+        if super_compost := imsearch.search_img_in_rect(super_compost_bank_img, self.win.game_view):
+            self.mouse.move_to(super_compost.random_point())
+            self.mouse.click()
+            self.sleep(1,2)
+        if not api_m.get_is_inv_full(): # Log out if no supplies are found
+            self.log_msg("No more supplies. Logging out.")
+            pag.press('escape')
+            self.logout()
+            self.stop()
+        else:
+            pag.press('escape')
+            self.sleep(0.5, 1)

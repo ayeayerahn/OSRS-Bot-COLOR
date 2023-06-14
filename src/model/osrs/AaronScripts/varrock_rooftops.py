@@ -1,29 +1,24 @@
 import time
-
-
 import utilities.color as clr
 import utilities.random_util as rd
 import utilities.imagesearch as imsearch
-import pyautogui as pag
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
-from utilities.api.status_socket import StatusSocket
 
 
-class OSRSardyrooftops(OSRSBot):
+class OSRSvarrockrooftops(OSRSBot):
     def __init__(self):
-        bot_title = "Ardy Rooftops"
-        description = "This bot will run rooftop agility at Ardy."
+        bot_title = "Varrock Rooftops"
+        description = "This bot will run rooftop agility at Varrock."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 10
+        self.running_time = 360
+        self.options_set = True
 
     def create_options(self):
-
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
 
     def save_options(self, options: dict):
-
         for option in options:
             if option == "running_time":
                 self.running_time = options[option]
@@ -40,10 +35,9 @@ class OSRSardyrooftops(OSRSBot):
 
         # Setup APIs
         api_m = MorgHTTPSocket()
-        #api_s = StatusSocket()
 
-        # pag.press('b')
-        # self.move_camera(0,80)
+        self.set_compass_west()
+        self.move_camera(0,80)
 
         # Main loop
         start_time = time.time()
@@ -53,13 +47,13 @@ class OSRSardyrooftops(OSRSBot):
             # -- Perform bot actions here --
             # Code within this block will LOOP until the bot is stopped.
 
-            #self.log_msg("Checking for marks")
+            self.log_msg("Checking for marks")
             self.check_for_marks() # Check if marks of grace are visible on screen
 
-            #self.log_msg("Checking for agility icon")
+            self.log_msg("Checking for agility icon")
             self.return_to_start() # Check if Agility icon is visible
 
-            #self.log_msg("Checking for green obstacles")
+            self.log_msg("Checking for green obstacles")
             self.green_obstacle(api_m) # If neither of the above are true, find and click green obstacle
 
 
@@ -77,15 +71,15 @@ class OSRSardyrooftops(OSRSBot):
 
     def return_to_start(self):
         obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
-        agility_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ardy_agility.png")
+        achievement_icon_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Achievement_Diaries_icon.png")
         if not obstacle_tiles:
             # If no obstacles can be seen, look for the agility icon
-            if agility:= imsearch.search_img_in_rect(agility_img, self.win.minimap):
+            if achievement_icon:= imsearch.search_img_in_rect(achievement_icon_img, self.win.minimap):
                 time.sleep(1)
-                self.mouse.move_to(agility.random_point())
+                self.mouse.move_to(achievement_icon.random_point())
                 time.sleep(1)
                 self.mouse.click()
-                self.sleep(11,12)
+                self.sleep(16,17)
 
     
     def green_obstacle(self, api_m: MorgHTTPSocket):
@@ -94,13 +88,10 @@ class OSRSardyrooftops(OSRSBot):
             self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
         except: self.log_msg("Can't find a green obstacle")
-        #self.mouse.click()
-        api_m.wait_til_gained_xp("Agility", 20)
+        api_m.wait_til_gained_xp("Agility", 10)
         self.sleep(1.5,2)
 
     def check_for_marks(self):
-        #obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
-        #marks_of_grace = self.get_all_tagged_in_rect(self.win.game_view, clr.BLUE)
         marks_of_grace = self.get_nearest_tag(clr.BLUE)
         while marks_of_grace:
             obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
@@ -108,10 +99,9 @@ class OSRSardyrooftops(OSRSBot):
             time.sleep(1)
             if obstacle_tiles: # For the one time the bot sees a mark of grace on another platform before seeing the green tile in front of it
                 break
-            # self.mouse.move_to(marks_of_grace[0].random_point())
             self.mouse.move_to(marks_of_grace.random_point())
             if self.mouse.click(check_red_click=True):
                 self.log_msg("Successful click!")
-                time.sleep(2)
+                time.sleep(5)
                 break      
             marks_of_grace = self.get_nearest_tag(clr.BLUE)
