@@ -17,7 +17,8 @@ class OSRStruebloods(OSRSBot):
         description = "<Script description here>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
-        self.running_time = 10
+        self.running_time = 360
+        self.options_set = True
 
     def create_options(self):
         """
@@ -83,34 +84,14 @@ class OSRStruebloods(OSRSBot):
     # 1. Open bank, retrieve supplies, and close bank
         # 1a. Open bank
             self.open_bank()
-            while not api_m.get_is_player_idle():
-                time.sleep(1)
+            time.sleep(4)
+            # while not api_m.get_is_player_idle():
+            #     time.sleep(1)
         # 1b. Retrieve supplies
             self.get_supplies(api_m)
             time.sleep(0.5)
     # 2. Go to fairy ring
-        # 2a. Teleport via ardy cape
-            self.ardy_cape_teleport()
-            while not api_m.get_is_player_idle():
-                time.sleep(1)
-            tile = self.get_nearest_tag(clr.ORANGE)
-            self.mouse.move_to(tile.random_point())
-            self.mouse.click()
-            while not api_m.get_is_player_idle():
-                time.sleep(0.5)    
-            second_tile = self.get_nearest_tag(clr.CYAN)
-            self.mouse.move_to(second_tile.random_point())
-            self.mouse.click()
-            while not api_m.get_is_player_idle():
-                time.sleep(0.5)           
-        # # 2b. Locate and click quest icon on minimap
-            # self.locate_quest_icon()
-            # while not api_m.get_is_player_idle():
-            #     time.sleep(0.5) 
-        # # 2c. Locate and click fairy ring
-            self.click_fairy_ring()
-            while not api_m.get_is_player_idle():
-                time.sleep(1) 
+            self.start_run()
     # 3. Click necessary obstacles to reach the blood altar
             self.run_to_altar()
             time.sleep(3.3)
@@ -119,7 +100,7 @@ class OSRStruebloods(OSRSBot):
             self.click_altar(api_m)
     #5. Teleport to house to replenish run energy and return to Castle Wars to bank
             self.return_to_bank()
-            time.sleep(5)
+            time.sleep(4)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -133,6 +114,7 @@ class OSRStruebloods(OSRSBot):
             self.mouse.move_to(banker.random_point()) 
         self.mouse.click()
 
+
     def get_supplies(self, api_m:MorgHTTPSocket):
     # add a check if the blood essence is in the inventory
         # Assumes pouches, active blood ess, bank tabs, and rune pouch are already in inventory
@@ -141,56 +123,25 @@ class OSRStruebloods(OSRSBot):
         self.check_for_blood_ess()
         pure_ess_bank = imsearch.BOT_IMAGES.joinpath("Aarons_images", "pure_essence_bank.png")
         # This sequence will fill inventory with pure ess if our inventory is not already full
-        if not api_m.get_is_inv_full():
-            if pure_ess := imsearch.search_img_in_rect(pure_ess_bank, self.win.game_view):
-                self.mouse.move_to(pure_ess.random_point())
-                self.mouse.click()
-        #time.sleep(1)
-        # Fill small and giant pouch
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        if pure_ess := imsearch.search_img_in_rect(pure_ess_bank, self.win.game_view):
+            self.mouse.move_to(pure_ess.random_point(), mouseSpeed='fastest', knotsCount=0)
+            self.mouse.click()
+        # Fill colossal pouch
+        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest', knotsCount=0) # small pouch
         self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[4].random_point()) # medium pouch
-        self.mouse.click()
-        time.sleep(1)
-        if self.chatbox_text_RED(contains='Your rune pouch has decayed'):
-            self.repair_pouches(api_m)
-            self.open_bank()
-        time.sleep(0.5)
         # This sequence will fill inventory with pure ess if our inventory is not already full
-        if not api_m.get_is_inv_full():
-            if pure_ess := imsearch.search_img_in_rect(pure_ess_bank, self.win.game_view):
-                self.mouse.move_to(pure_ess.random_point())
-                self.mouse.click()
+        self.mouse.move_to(pure_ess.random_point(), knotsCount=0)
+        self.mouse.click()
         # Fill small and medium pouch
-        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest', knotsCount=0) # small pouch
         self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[5].random_point()) # medium pouch
-        self.mouse.click()
-        #time.sleep(0.5)
         # This sequence will fill inventory with pure ess if our inventory is not already full
-        if not api_m.get_is_inv_full():
-            if pure_ess := imsearch.search_img_in_rect(pure_ess_bank, self.win.game_view):
-                self.mouse.move_to(pure_ess.random_point())
-                self.mouse.click()
-        time.sleep(0.5)
-        pag.press('esc')
-
-    def ardy_cape_teleport(self):
-        ardy_cape_inv = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ardougne_cloak_1.png")
-        self.mouse.move_to(self.win.cp_tabs[4].random_point())
+        self.mouse.move_to(pure_ess.random_point(), knotsCount=0)
         self.mouse.click()
-        time.sleep(0.5)
-        if ardy_cape := imsearch.search_img_in_rect(ardy_cape_inv, self.win.control_panel):
-            self.mouse.move_to(ardy_cape.random_point())
-            self.mouse.click()
-        self.mouse.move_to(self.win.cp_tabs[3].random_point())
-        self.mouse.click()        
-
-    def locate_quest_icon(self):
-        quest_icon_minimap = imsearch.BOT_IMAGES.joinpath("Aarons_images", "quest_start_icon.png")
-        if quest_icon := imsearch.search_img_in_rect(quest_icon_minimap, self.win.minimap):
-            self.mouse.move_to(quest_icon.random_point())
-            self.mouse.click()
+        while not api_m.get_is_inv_full():
+            time.sleep(0.5)
+        pag.press('esc')   
+        self.repair_pouches(api_m)
 
     def click_fairy_ring(self):
         fairy_ring = self.get_nearest_tag(clr.YELLOW)
@@ -239,49 +190,49 @@ class OSRStruebloods(OSRSBot):
             self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
             self.mouse.click()
         api_m.wait_til_gained_xp("Runecraft", 10)
-        self.empty_pouches_first()
+        self.empty_pouches()
         if altar := self.get_nearest_tag(clr.RED):
             self.log_msg("Crafting second set of essence..")
             self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
             self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 3)
-        self.empty_pouches_second()
+        api_m.wait_til_gained_xp("Runecraft", 2)
+        self.empty_pouches()
         if altar := self.get_nearest_tag(clr.RED):
             self.log_msg("Crafting third set of essence..")
             self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
             self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 3)
-        time.sleep(1.5) # Gives enough time to let your character become idle
+        api_m.wait_til_gained_xp("Runecraft", 1)
+        #time.sleep(1.5) # Gives enough time to let your character become idle
 
-    def empty_pouches_first(self):
+    def empty_pouches(self):
         pag.keyDown('shift')
         self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[4].random_point(), mouseSpeed='fastest') # medium pouch
-        self.mouse.click()
-        pag.keyUp('shift')
-
-    def empty_pouches_second(self):
-        pag.keyDown('shift')
-        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[5].random_point(), mouseSpeed='fastest') # medium pouch
         self.mouse.click()
         pag.keyUp('shift')
 
     def return_to_bank(self):
-        self.mouse.move_to(self.win.inventory_slots[6].random_point(), mouseSpeed='fastest') # small pouch
+        # Bank with craft cape
+        self.mouse.move_to(self.win.inventory_slots[7].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
-        time.sleep(5)
 
-        pool = self.get_nearest_tag(clr.PURPLE)
-        self.mouse.move_to(pool.random_point(), mouseSpeed='fast')
+    def start_run(self):
+        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest')
         self.mouse.click()
-        time.sleep(3)
+        fairy_ring = self.get_nearest_tag(clr.YELLOW)
+        while not fairy_ring:
+            fairy_ring = self.get_nearest_tag(clr.YELLOW)
+            time.sleep(0.5)
 
-        jewel_box = self.get_nearest_tag(clr.RED)
-        self.mouse.move_to(jewel_box.random_point(), mouseSpeed='fast')
+        run_energy = self.get_run_energy()
+        if run_energy < 25:
+            pool = self.get_nearest_tag(clr.PURPLE)
+            self.mouse.move_to(pool.random_point(), mouseSpeed='fast')
+            self.mouse.click()
+            time.sleep(3)
+        fairy_ring = self.get_nearest_tag(clr.YELLOW)
+        self.mouse.move_to(fairy_ring.random_point(), mouseSpeed='fast')
         self.mouse.click()
+        #time.sleep(3)
 
     def deposit_all(self): 
         deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
@@ -290,11 +241,9 @@ class OSRStruebloods(OSRSBot):
             self.mouse.click()  
 
     def repair_pouches(self, api_m: MorgHTTPSocket):
-        large_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "large_pouch.png")
-        giant_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "giant_pouch.png")
-        large_rune_pouch = imsearch.search_img_in_rect(large_rune_pouch_img, self.win.inventory_slots[2])
-        giant_rune_pouch = imsearch.search_img_in_rect(giant_rune_pouch_img, self.win.inventory_slots[3])
-        if not large_rune_pouch or not giant_rune_pouch:
+        colossal_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "colossal_pouch.png")
+        colossal_rune_pouch = imsearch.search_img_in_rect(colossal_rune_pouch_img, self.win.control_panel)
+        if not colossal_rune_pouch:
             pag.press('esc')
             time.sleep(0.5)
             spellbook_tab = self.win.cp_tabs[6]
@@ -315,22 +264,23 @@ class OSRStruebloods(OSRSBot):
             pag.press('2')
             time.sleep(1)
             pag.press('space')
-            time.sleep(1)
-            pag.press('2')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('2')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
-            pag.press('space')
-            time.sleep(1)
+            # time.sleep(1)
+            # pag.press('2')
+            # time.sleep(1)
+            # pag.press('space')
+            # time.sleep(1)
+            # pag.press('space')
+            # time.sleep(1)
+            # pag.press('2')
+            # time.sleep(1)
+            # pag.press('space')
+            # time.sleep(1)
+            # pag.press('space')
+            # time.sleep(1)
             self.mouse.move_to(self.win.cp_tabs[3].random_point())
             self.mouse.click()
             time.sleep(1)
+            #self.open_bank()
 
     def check_for_blood_ess(self):
         blood_ess_inv_active_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Blood_essence_active_inv.png")
@@ -345,8 +295,8 @@ class OSRStruebloods(OSRSBot):
                 self.mouse.click()
                 time.sleep(0.5)
                 pag.press('esc')
-                self.mouse.move_to(self.win.inventory_slots[2].random_point())
+                self.mouse.move_to(self.win.inventory_slots[1].random_point())
                 self.mouse.click()
                 time.sleep(0.5)
                 self.open_bank()
-            time.sleep(0.5)
+            time.sleep(1)
