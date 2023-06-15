@@ -12,7 +12,7 @@ class OSRScanifisrooftops(OSRSBot):
         description = "This bot will run rooftop agility at Canifis."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 360
+        self.running_time = 1000
         self.options_set = True
 
     def create_options(self):
@@ -90,7 +90,7 @@ class OSRScanifisrooftops(OSRSBot):
             self.mouse.move_to(obstacle_tiles.random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
         except: self.log_msg("Can't find a green obstacle")
-        api_m.wait_til_gained_xp("Agility", 13)
+        api_m.wait_til_gained_xp("Agility", 16)
         self.sleep(0.5,0.8)
 
     def check_for_marks(self):

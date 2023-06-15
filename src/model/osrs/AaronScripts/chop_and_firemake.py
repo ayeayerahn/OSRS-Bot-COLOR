@@ -1,13 +1,9 @@
 import time
-
-import pyautogui as pag
 import utilities.color as clr
 import utilities.api.item_ids as ids
 import utilities.random_util as rd
-import utilities.imagesearch as imsearch
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
-from utilities.api.status_socket import StatusSocket
 
 
 class OSRSchop_and_firemake(OSRSBot):
@@ -16,7 +12,7 @@ class OSRSchop_and_firemake(OSRSBot):
         description = "This bot will light logs."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 360
+        self.running_time = 1000
         self.options_set = True
 
     def create_options(self):
@@ -39,22 +35,13 @@ class OSRSchop_and_firemake(OSRSBot):
 
         # Setup APIs
         api_m = MorgHTTPSocket()
-        api_s = StatusSocket()
 
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
 
-            self.woodcut()
-            while not api_m.get_is_player_idle():
-                time.sleep(1)
-            tile = self.get_nearest_tag(clr.CYAN)
-            self.mouse.move_to(tile.random_point())
-            self.mouse.click()
-            time.sleep(2)
-            while not api_m.get_is_player_idle():
-                time.sleep(1)
+            self.woodcut(api_m)
             self.firemake(api_m)
 
             self.update_progress((time.time() - start_time) / end_time)
@@ -63,12 +50,20 @@ class OSRSchop_and_firemake(OSRSBot):
         self.log_msg("Finished.")
         self.stop()
 
-    def woodcut(self):
-        tree = self.get_nearest_tag(clr.GREEN)
-        if tree:
-            self.mouse.move_to(tree.random_point())
-            self.mouse.click()
-            time.sleep(3)
+    def woodcut(self, api_m: MorgHTTPSocket):
+        if not api_m.get_is_inv_full():
+            if tree := self.get_nearest_tag(clr.GREEN):
+                self.mouse.move_to(tree.random_point())
+                self.mouse.click()
+                self.log_msg("Wooducutting until we have a full inventory.")
+                time.sleep(3)
+        while not api_m.get_is_player_idle():
+            time.sleep(1)
+        if api_m.get_is_inv_full():
+            self.log_msg("Inventory is full. Time to firemake.")
+            return self.firemaking_spot()
+        else:
+            return self.woodcut(api_m)       
 
     def firemake(self, api_m: MorgHTTPSocket):
         oak_logs = api_m.get_inv_item_indices(ids.logs)
@@ -82,38 +77,9 @@ class OSRSchop_and_firemake(OSRSBot):
         time.sleep(1)
         self.log_msg("Out of logs. Time to cut again.")
 
-
-    def first_spot(self):
-        tile = self.get_all_tagged_in_rect(self.win.game_view, clr.PINK)
-        self.log_msg("Heading to the first tile")
-        self.mouse.move_to(tile[0].random_point())
+    def firemaking_spot(self):
+        tile = self.get_nearest_tag(clr.CYAN)
+        self.mouse.move_to(tile.random_point())
         self.mouse.click()
+        self.log_msg("Running to firemaking spot.")
         time.sleep(5)
-
-    def open_bank(self):
-        banker = self.get_nearest_tag(clr.CYAN)
-        self.mouse.move_to(banker.random_point())  
-        self.mouse.click()
-        self.sleep(1,2)
-
-    def second_spot(self):
-        tile = self.get_all_tagged_in_rect(self.win.game_view, clr.PURPLE)
-        self.log_msg("Heading to the second tile")
-        self.mouse.move_to(tile[0].random_point())
-        self.mouse.click()
-        time.sleep(3)
-
-    def sleep(self, num1, num2):
-        sleep_time = rd.fancy_normal_sample(num1, num2)   
-        #self.log_msg(f"Sleeping for {sleep_time} seconds")     #Uncomment this out if you wish to see how many seconds the sleep is doing
-        time.sleep(sleep_time)       
-
-    def third_spot(self):
-        tile = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN)
-        self.log_msg("Heading to the third tile")
-        self.mouse.move_to(tile[0].random_point())
-        self.mouse.click()
-        time.sleep(5)
-
-# TO DO's
-# Maybe rotate through 3-4 different squares to add variation to "start point"
