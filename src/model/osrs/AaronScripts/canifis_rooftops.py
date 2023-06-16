@@ -2,6 +2,9 @@ import time
 import utilities.color as clr
 import utilities.random_util as rd
 import utilities.imagesearch as imsearch
+import pyautogui as pag
+import utilities.ocr as ocr
+from utilities.geometry import Rectangle, Point
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 
@@ -88,7 +91,9 @@ class OSRScanifisrooftops(OSRSBot):
         try: 
             #self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
             self.mouse.move_to(obstacle_tiles.random_point(), mouseSpeed = 'fastest')
-            self.mouse.click()
+            if self.mouseover_text(color=[clr.OFF_WHITE, clr.CYAN]):
+                if not self.mouse.click(check_red_click=True):
+                    return self.green_obstacle(api_m)
         except: self.log_msg("Can't find a green obstacle")
         api_m.wait_til_gained_xp("Agility", 16)
         self.sleep(0.5,0.8)
@@ -104,6 +109,18 @@ class OSRScanifisrooftops(OSRSBot):
             self.mouse.move_to(marks_of_grace.random_point())
             if self.mouse.click(check_red_click=True):
                 self.log_msg("Successful click!")
-                time.sleep(5)
+                self.wait_until_color(color=clr.GREEN, timeout=10)
                 break      
             marks_of_grace = self.get_nearest_tag(clr.BLUE)
+
+    def wait_until_color(self, color: clr, timeout: int = 10):
+        """this will wait till nearest tag is not none"""
+        time_start = time.time()
+        while True:
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+            if found := self.get_nearest_tag(color):
+                break
+            time.sleep(1)
+        return

@@ -1,8 +1,5 @@
 import time
-
-import utilities.api.item_ids as ids
 import utilities.color as clr
-import utilities.random_util as rd
 import pyautogui as pag
 import utilities.ocr as ocr
 from model.osrs.osrs_bot import OSRSBot
@@ -16,7 +13,8 @@ class OSRSConstruction(OSRSBot):
         description = "<Script description here>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
-        self.running_time = 100
+        self.running_time = 1000
+        self.options_set = True
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -46,7 +44,6 @@ class OSRSConstruction(OSRSBot):
     def main_loop(self):
         # Setup APIs
         api_m = MorgHTTPSocket()
-        # api_s = StatusSocket()
 
         # Main loop
         start_time = time.time()
@@ -102,7 +99,7 @@ class OSRSConstruction(OSRSBot):
         self.mouse.move_to(planks.random_point())
         self.mouse.click()
     # Left click on the dude in shop
-        store_guy = self.get_nearest_tagged_NPC()
+        store_guy = self.get_nearest_tag(clr.CYAN)
         self.mouse.move_to(store_guy.random_point())
         self.mouse.click()
 
