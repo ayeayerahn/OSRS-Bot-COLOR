@@ -57,7 +57,7 @@ class OSRSConstruction(OSRSBot):
                 self.get_planks()
                 time.sleep(4)
                 pag.press('3')
-
+            time.sleep(0.5)
         #2. Right click on portal and enter build mode
             self.enter_house()
             
@@ -65,26 +65,23 @@ class OSRSConstruction(OSRSBot):
         #3. Right click on larder and select build
             self.right_click_larder()
             self.build_larder()
-            larder = self.get_nearest_tag(clr.YELLOW)
-            if larder:
-                self.remove_larder()
-                time.sleep(4)
+            # larder = self.get_nearest_tag(clr.YELLOW)
+            # if larder:
+            #     self.remove_larder()
+            #     time.sleep(4)
             time.sleep(2.5)
             pag.press('2')
-            #time.sleep(1.5)
             self.remove_larder()
-            time.sleep(1)
+            # time.sleep(1)
             for i in range(2):
                 self.right_click_larder()
         #4. Build larder
                 self.build_larder()
-                #time.sleep(2)
         #5. Destroy larder
                 self.remove_larder()
-                #time.sleep(1)
         #6. Left click to exit portal
             self.exit_portal()
-            time.sleep(3)
+            self.wait_until_color(color=clr.CYAN)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -99,8 +96,16 @@ class OSRSConstruction(OSRSBot):
         self.mouse.move_to(planks.random_point())
         self.mouse.click()
     # Left click on the dude in shop
+<<<<<<< Updated upstream
         store_guy = self.get_nearest_tag(clr.CYAN)
         self.mouse.move_to(store_guy.random_point())
+=======
+        store_guy = self.get_nearest_tagged_NPC()
+        try:
+            self.mouse.move_to(store_guy.random_point())
+        except AttributeError:
+            self.log_msg("Couldn't find the store guy. Trying again.")
+>>>>>>> Stashed changes
         self.mouse.click()
 
 
@@ -111,20 +116,22 @@ class OSRSConstruction(OSRSBot):
             self.mouse.move_to(portal.random_point(), mouseSpeed='fastest')
         except AttributeError:
             self.log_msg(AttributeError)
-        self.mouse.right_click()
+        self.mouse.click()
+        # self.mouse.right_click()
 
-        if build_mode_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, [clr.OFF_WHITE, clr.CYAN]):
-            self.mouse.move_to(build_mode_text[0].get_center(), knotsCount=0)
-            self.mouse.click()
+        # if build_mode_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, [clr.OFF_WHITE, clr.CYAN]):
+        #     self.mouse.move_to(build_mode_text[0].get_center(), knotsCount=0)
+        #     self.mouse.click()
 
 
     #loop twice
     #3. Right click on larder and select build
     def right_click_larder(self):
+        # while not larder:
+        #     larder = self.get_nearest_tag(clr.GREEN)
+        #     time.sleep(0.1)
+        self.wait_until_color(color=clr.GREEN)
         larder = self.get_nearest_tag(clr.GREEN)
-        while not larder:
-            larder = self.get_nearest_tag(clr.GREEN)
-            time.sleep(0.1)
         try:
             self.mouse.move_to(larder.random_point(), mouseSpeed='fastest')
         except AttributeError:
@@ -142,10 +149,8 @@ class OSRSConstruction(OSRSBot):
 
         #5. Destroy larder
     def remove_larder(self):
+        self.wait_until_color(color=clr.YELLOW)         
         larder = self.get_nearest_tag(clr.YELLOW)
-        while not larder:
-            larder = self.get_nearest_tag(clr.YELLOW)
-            time.sleep(0.2)            
         try:
             self.mouse.move_to(larder.random_point(), mouseSpeed='fastest')
         except AttributeError:
@@ -160,9 +165,21 @@ class OSRSConstruction(OSRSBot):
 
         #6. Left click to exit portal
     def exit_portal(self):
-        portal = self.get_nearest_tag(clr.CYAN)
+        portal = self.get_nearest_tag(clr.ORANGE)
         try:
             self.mouse.move_to(portal.random_point())
         except AttributeError:
             self.log_msg(AttributeError)
         self.mouse.click()
+
+    def wait_until_color(self, color: clr, timeout: int = 10):
+        """this will wait till nearest tag is not none"""
+        time_start = time.time()
+        while True:
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+            if found := self.get_nearest_tag(color):
+                break
+            time.sleep(0.1)
+        return
