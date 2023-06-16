@@ -96,16 +96,8 @@ class OSRSConstruction(OSRSBot):
         self.mouse.move_to(planks.random_point())
         self.mouse.click()
     # Left click on the dude in shop
-<<<<<<< Updated upstream
         store_guy = self.get_nearest_tag(clr.CYAN)
         self.mouse.move_to(store_guy.random_point())
-=======
-        store_guy = self.get_nearest_tagged_NPC()
-        try:
-            self.mouse.move_to(store_guy.random_point())
-        except AttributeError:
-            self.log_msg("Couldn't find the store guy. Trying again.")
->>>>>>> Stashed changes
         self.mouse.click()
 
 
