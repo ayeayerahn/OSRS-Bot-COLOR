@@ -35,10 +35,6 @@ class OSRScanifisrooftops(OSRSBot):
         self.options_set = True
 
     def main_loop(self):
-
-        # Setup APIs
-        api_m = MorgHTTPSocket()
-
         #self.set_compass_west()
         #self.move_camera(0,80)
 
@@ -57,7 +53,7 @@ class OSRScanifisrooftops(OSRSBot):
             #self.return_to_start() # Check if Agility icon is visible
 
             self.log_msg("Checking for green obstacles")
-            self.green_obstacle(api_m) # If neither of the above are true, find and click green obstacle
+            self.green_obstacle() # If neither of the above are true, find and click green obstacle
 
 
             self.update_progress((time.time() - start_time) / end_time)
@@ -85,18 +81,17 @@ class OSRScanifisrooftops(OSRSBot):
                 self.sleep(16,17)
 
     
-    def green_obstacle(self, api_m: MorgHTTPSocket):
+    def green_obstacle(self):
         last_xp = self.get_total_xp()
         counter = 0 
         obstacle_tiles = self.get_nearest_tag(clr.GREEN) # Since we moved the camera, check again
         try: 
-            #self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
             self.mouse.move_to(obstacle_tiles.random_point(), mouseSpeed = 'fastest')
             if self.mouseover_text(color=[clr.OFF_WHITE, clr.CYAN]):
                 if not self.mouse.click(check_red_click=True):
-                    return self.green_obstacle(api_m)
+                    return self.green_obstacle()
         except: self.log_msg("Can't find a green obstacle")
-        while counter < 20:
+        while counter < 17:
             new_xp = self.get_total_xp()
             if new_xp != last_xp:
                 break
@@ -104,8 +99,6 @@ class OSRScanifisrooftops(OSRSBot):
             self.log_msg(f"Seconds elapsed: {counter}")
             time.sleep(1)
         counter = 0
-        # api_m.wait_til_gained_xp("Agility", 16)
-        # self.sleep(0.5,0.8)
 
     def check_for_marks(self):
         marks_of_grace = self.get_nearest_tag(clr.BLUE)
@@ -116,11 +109,12 @@ class OSRScanifisrooftops(OSRSBot):
             if obstacle_tiles: # For the one time the bot sees a mark of grace on another platform before seeing the green tile in front of it
                 break
             self.mouse.move_to(marks_of_grace.random_point())
-            if self.mouse.click(check_red_click=True):
-                self.log_msg("Successful click!")
-                self.wait_until_color(color=clr.GREEN, timeout=10)
-                break      
-            marks_of_grace = self.get_nearest_tag(clr.BLUE)
+            if self.mouseover_text(contains="Mark of grace", color=clr.OFF_ORANGE):
+                if self.mouse.click(check_red_click=True):
+                    self.log_msg("Successful click!")
+                    self.wait_until_color(color=clr.GREEN, timeout=10)
+                    break      
+            return self.check_for_marks()
 
     def wait_until_color(self, color: clr, timeout: int = 10):
         """this will wait till nearest tag is not none"""
