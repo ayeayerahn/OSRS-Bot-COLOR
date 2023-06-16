@@ -86,7 +86,8 @@ class OSRScanifisrooftops(OSRSBot):
 
     
     def green_obstacle(self, api_m: MorgHTTPSocket):
-        # obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN) # Since we moved the camera, check again
+        last_xp = self.get_total_xp()
+        counter = 0 
         obstacle_tiles = self.get_nearest_tag(clr.GREEN) # Since we moved the camera, check again
         try: 
             #self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
@@ -95,8 +96,16 @@ class OSRScanifisrooftops(OSRSBot):
                 if not self.mouse.click(check_red_click=True):
                     return self.green_obstacle(api_m)
         except: self.log_msg("Can't find a green obstacle")
-        api_m.wait_til_gained_xp("Agility", 16)
-        self.sleep(0.5,0.8)
+        while counter < 20:
+            new_xp = self.get_total_xp()
+            if new_xp != last_xp:
+                break
+            counter += 1
+            self.log_msg(f"Seconds elapsed: {counter}")
+            time.sleep(1)
+        counter = 0
+        # api_m.wait_til_gained_xp("Agility", 16)
+        # self.sleep(0.5,0.8)
 
     def check_for_marks(self):
         marks_of_grace = self.get_nearest_tag(clr.BLUE)
