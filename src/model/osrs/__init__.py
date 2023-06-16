@@ -8,6 +8,9 @@ from .AaronScripts.powerminer import OSRSpowerminer
 #from .AaronScripts.ardyrooftops import OSRSardyrooftops
 from .AaronScripts.GOTR import OSRSGOTR
 from.AaronScripts.truebloods import OSRStruebloods
+<<<<<<< Updated upstream
 from .AaronScripts.chop_and_firemake import OSRSchop_and_firemake
+=======
+>>>>>>> Stashed changes
 from .AaronScripts.canifis_rooftops import OSRScanifisrooftops
 from .AaronScripts.construction import OSRSConstruction
