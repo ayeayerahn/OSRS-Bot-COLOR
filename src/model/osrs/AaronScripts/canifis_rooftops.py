@@ -2,11 +2,7 @@ import time
 import utilities.color as clr
 import utilities.random_util as rd
 import utilities.imagesearch as imsearch
-import pyautogui as pag
-import utilities.ocr as ocr
-from utilities.geometry import Rectangle, Point
 from model.osrs.osrs_bot import OSRSBot
-from utilities.api.morg_http_client import MorgHTTPSocket
 
 
 class OSRScanifisrooftops(OSRSBot):
