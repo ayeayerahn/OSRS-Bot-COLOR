@@ -2,9 +2,12 @@ import time
 import utilities.color as clr
 import pyautogui as pag
 import utilities.ocr as ocr
+import utilities.imagesearch as imsearch
 from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
 from utilities.api.status_socket import StatusSocket
+from utilities.imagesearch import search_img_in_rect
+from utilities.geometry import Rectangle
 
 
 class OSRSConstruction(OSRSBot):
@@ -53,22 +56,16 @@ class OSRSConstruction(OSRSBot):
             # Code within this block will LOOP until the bot is stopped.
 
         # 1. Get planks from dude in the shop
-            if not api_m.get_is_inv_full():
+            if not self.search_slot_28():
                 self.get_planks()
                 time.sleep(4)
                 pag.press('3')
-            time.sleep(0.5)
+                time.sleep(0.5)
         #2. Right click on portal and enter build mode
             self.enter_house()
-            
-            #time.sleep(6)
         #3. Right click on larder and select build
             self.right_click_larder()
             self.build_larder()
-            # larder = self.get_nearest_tag(clr.YELLOW)
-            # if larder:
-            #     self.remove_larder()
-            #     time.sleep(4)
             time.sleep(2.5)
             pag.press('2')
             self.remove_larder()
@@ -98,6 +95,7 @@ class OSRSConstruction(OSRSBot):
     # Left click on the dude in shop
         store_guy = self.get_nearest_tag(clr.CYAN)
         self.mouse.move_to(store_guy.random_point())
+        #if self.mouseover_text(contains="Phials", color=clr.OFF_YELLOW):
         self.mouse.click()
 
 
@@ -109,19 +107,9 @@ class OSRSConstruction(OSRSBot):
         except AttributeError:
             self.log_msg(AttributeError)
         self.mouse.click()
-        # self.mouse.right_click()
 
-        # if build_mode_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, [clr.OFF_WHITE, clr.CYAN]):
-        #     self.mouse.move_to(build_mode_text[0].get_center(), knotsCount=0)
-        #     self.mouse.click()
-
-
-    #loop twice
     #3. Right click on larder and select build
     def right_click_larder(self):
-        # while not larder:
-        #     larder = self.get_nearest_tag(clr.GREEN)
-        #     time.sleep(0.1)
         self.wait_until_color(color=clr.GREEN)
         larder = self.get_nearest_tag(clr.GREEN)
         try:
@@ -132,7 +120,6 @@ class OSRSConstruction(OSRSBot):
 
         #4. Build larder
     def build_larder(self):
-            # Right click and Press 2
         if build_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, clr.WHITE):
             self.mouse.move_to(build_text[0].get_center(), knotsCount=0, mouseSpeed='fastest')
             self.mouse.click()
@@ -175,3 +162,34 @@ class OSRSConstruction(OSRSBot):
                 break
             time.sleep(0.1)
         return
+    
+#This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.
+    def search_slot_28(self):
+        #define inventory_slots
+        self.__locate_inv_slots(self.win.control_panel)
+        # Create a rectangle for the 28th inventory slot
+        slot_28 = self.inventory_slots[27]
+
+        # Search for each item in the 28th inventory slot
+        item_path = imsearch.BOT_IMAGES.joinpath("Aarons_images", "emptyslot.PNG")
+        if search_img_in_rect(item_path, slot_28):
+            self.log_msg(f"Slot 28: Empty")
+            return False
+        self.log_msg(f"Slot 28: Full")
+        return True
+    
+#Make sure that this function is either imported from another file or defined in the same file before calling it.
+    def __locate_inv_slots(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each inventory slot relative to the control panel, storing it in the class property.
+        """
+        self.inventory_slots = []
+        slot_w, slot_h = 36, 32  # dimensions of a slot
+        gap_x, gap_y = 6, 4  # pixel gap between slots
+        y = 44 + cp.top  # start y relative to cp template
+        for _ in range(7):
+            x = 40 + cp.left  # start x relative to cp template
+            for _ in range(4):
+                self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+                x += slot_w + gap_x
+            y += slot_h + gap_y
