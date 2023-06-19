@@ -4,10 +4,9 @@ import pyautogui as pag
 import utilities.ocr as ocr
 import utilities.imagesearch as imsearch
 from model.osrs.osrs_bot import OSRSBot
-from utilities.api.morg_http_client import MorgHTTPSocket
-from utilities.api.status_socket import StatusSocket
 from utilities.imagesearch import search_img_in_rect
-from utilities.geometry import Rectangle
+from utilities.geometry import Rectangle, Point
+from pathlib import Path
 
 
 class OSRSConstruction(OSRSBot):
@@ -45,9 +44,6 @@ class OSRSConstruction(OSRSBot):
         self.options_set = True
 
     def main_loop(self):
-        # Setup APIs
-        api_m = MorgHTTPSocket()
-
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
@@ -61,24 +57,26 @@ class OSRSConstruction(OSRSBot):
                 time.sleep(4)
                 pag.press('3')
                 time.sleep(0.5)
+                self.enter_house()
         #2. Right click on portal and enter build mode
-            self.enter_house()
+            else:
+                self.enter_house()
         #3. Right click on larder and select build
-            self.right_click_larder()
-            self.build_larder()
-            time.sleep(2.5)
+            self.right_click_build_larder()
+            time.sleep(3.5)
             pag.press('2')
             self.remove_larder()
             # time.sleep(1)
             for i in range(2):
-                self.right_click_larder()
-        #4. Build larder
-                self.build_larder()
+                self.right_click_build_larder()
+                time.sleep(1)
+                pag.press('2')
         #5. Destroy larder
                 self.remove_larder()
+            time.sleep(0.5)
         #6. Left click to exit portal
             self.exit_portal()
-            self.wait_until_color(color=clr.CYAN)
+            self.wait_until_color(color=clr.RED)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -93,23 +91,25 @@ class OSRSConstruction(OSRSBot):
         self.mouse.move_to(planks.random_point())
         self.mouse.click()
     # Left click on the dude in shop
-        store_guy = self.get_nearest_tag(clr.CYAN)
-        self.mouse.move_to(store_guy.random_point())
+        if store_guy := self.get_nearest_tag(clr.CYAN):
+            try:
+                self.mouse.move_to(store_guy.random_point())
+            except AttributeError:
+                self.log_msg("Couldn't find the store guy. Trying again.")
         #if self.mouseover_text(contains="Phials", color=clr.OFF_YELLOW):
         self.mouse.click()
 
-
     #2. Right click on portal and enter build mode
     def enter_house(self):
-        portal = self.get_nearest_tag(clr.RED)
-        try:
-            self.mouse.move_to(portal.random_point(), mouseSpeed='fastest')
-        except AttributeError:
-            self.log_msg(AttributeError)
+        if portal := self.get_nearest_tag(clr.RED):
+            try:
+                self.mouse.move_to(portal.random_point(), mouseSpeed='fastest')
+            except AttributeError:
+                self.log_msg("Couldn't find the entry portal. Trying again.")
         self.mouse.click()
 
     #3. Right click on larder and select build
-    def right_click_larder(self):
+    def right_click_build_larder(self):
         self.wait_until_color(color=clr.GREEN)
         larder = self.get_nearest_tag(clr.GREEN)
         try:
@@ -117,14 +117,9 @@ class OSRSConstruction(OSRSBot):
         except AttributeError:
             self.log_msg(AttributeError)
         self.mouse.right_click()
-
-        #4. Build larder
-    def build_larder(self):
         if build_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, clr.WHITE):
             self.mouse.move_to(build_text[0].get_center(), knotsCount=0, mouseSpeed='fastest')
             self.mouse.click()
-        time.sleep(1)
-        pag.press('2')
 
         #5. Destroy larder
     def remove_larder(self):
@@ -135,7 +130,6 @@ class OSRSConstruction(OSRSBot):
         except AttributeError:
             self.log_msg(AttributeError)
         self.mouse.right_click()
-
         if build_text := ocr.find_text("Remove", self.win.game_view, ocr.BOLD_12, clr.WHITE):
             self.mouse.move_to(build_text[0].get_center(), knotsCount=0, mouseSpeed='fastest')
             self.mouse.click()
