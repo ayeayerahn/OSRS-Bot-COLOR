@@ -92,21 +92,33 @@ class OSRSConstruction(OSRSBot):
         self.mouse.click()
     # Left click on the dude in shop
         if store_guy := self.get_nearest_tag(clr.CYAN):
-            try:
-                self.mouse.move_to(store_guy.random_point())
-            except AttributeError:
-                self.log_msg("Couldn't find the store guy. Trying again.")
+            if self.mouseover_text(contains="Use Oak plank", color=[clr.OFF_WHITE, clr.OFF_ORANGE]):
+                try:
+                    self.mouse.move_to(store_guy.random_point())
+                except AttributeError:
+                    self.log_msg("Couldn't find the store guy. Trying again.")
+            else:
+                self.log_msg("We probably didn't successfully use the planks on the store guy. Returning main loop.")
+                return self.main_loop()
         #if self.mouseover_text(contains="Phials", color=clr.OFF_YELLOW):
         self.mouse.click()
 
     #2. Right click on portal and enter build mode
     def enter_house(self):
+        counter = 0
         if portal := self.get_nearest_tag(clr.RED):
-            try:
-                self.mouse.move_to(portal.random_point(), mouseSpeed='fastest')
-            except AttributeError:
-                self.log_msg("Couldn't find the entry portal. Trying again.")
-        self.mouse.click()
+            while counter != 10:
+                try:
+                    self.mouse.move_to(portal.random_point(), mouseSpeed='fastest')
+                except AttributeError:
+                    self.log_msg("Couldn't find the entry portal. Trying again.")
+                if self.mouseover_text(contains="Build mode", color=clr.OFF_WHITE):
+                    self.mouse.click()
+                    counter = 0
+                    break
+                else:
+                    return self.enter_house()
+            counter += 1
 
     #3. Right click on larder and select build
     def right_click_build_larder(self):
@@ -117,9 +129,13 @@ class OSRSConstruction(OSRSBot):
         except AttributeError:
             self.log_msg(AttributeError)
         self.mouse.right_click()
-        if build_text := ocr.find_text("Build", self.win.game_view, ocr.BOLD_12, clr.WHITE):
+        if build_text := ocr.find_text("Build Larder", self.win.game_view, ocr.BOLD_12, [clr.OFF_WHITE, clr.CYAN]):
             self.mouse.move_to(build_text[0].get_center(), knotsCount=0, mouseSpeed='fastest')
             self.mouse.click()
+        else:
+            self.mouse.move_to(self.win.inventory_slots[0].random_point())
+            time.sleep(1)
+            return self.right_click_build_larder()
 
         #5. Destroy larder
     def remove_larder(self):
