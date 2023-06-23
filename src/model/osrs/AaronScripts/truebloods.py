@@ -5,7 +5,9 @@ import utilities.imagesearch as imsearch
 import utilities.ocr as ocr
 import pyautogui as pag
 from model.osrs.osrs_bot import OSRSBot
-from utilities.api.morg_http_client import MorgHTTPSocket
+from utilities.imagesearch import search_img_in_rect
+from utilities.geometry import Rectangle, Point
+from pathlib import Path
 
 
 class OSRStruebloods(OSRSBot):
@@ -44,7 +46,7 @@ class OSRStruebloods(OSRSBot):
 
     def main_loop(self):
         # Setup APIs
-        api_m = MorgHTTPSocket()
+        # api_m = MorgHTTPSocket()
         # api_s = StatusSocket()
 
         # Main loop
@@ -56,10 +58,10 @@ class OSRStruebloods(OSRSBot):
     # 1. Open bank, retrieve supplies, and close bank
         # 1a. Open bank
             self.open_bank()
-            time.sleep(4)
+            time.sleep(3.5)
         # 1b. Retrieve supplies
-            self.get_supplies(api_m)
-            time.sleep(0.5)
+            self.get_supplies()
+            #time.sleep(0.5)
     # 2. Go to fairy ring
             self.start_run()
     # 3. Click necessary obstacles to reach the blood altar
@@ -67,10 +69,10 @@ class OSRStruebloods(OSRSBot):
             time.sleep(3.3)
             self.enter_altar()
     #4. Craft runes
-            self.click_altar(api_m)
+            self.click_altar()
     #5. Teleport to house to replenish run energy and return to Castle Wars to bank
             self.return_to_bank()
-            time.sleep(4)
+            self.wait_until_color(color=clr.CYAN, timeout=10)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -82,10 +84,10 @@ class OSRStruebloods(OSRSBot):
         banker = self.get_nearest_tag(clr.CYAN)
         if not self.mouseover_text(contains="Bank"):
             self.mouse.move_to(banker.random_point()) 
-        self.mouse.click()
+        if not self.mouse.click(check_red_click=True):
+            return self.open_bank()
 
-
-    def get_supplies(self, api_m:MorgHTTPSocket):
+    def get_supplies(self):
         # Assumes pouches, active blood ess, bank tabs, and rune pouch are already in inventory
         # Assumes withdraw all is defaulted
         self.deposit_all()
@@ -99,107 +101,83 @@ class OSRStruebloods(OSRSBot):
         self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest', knotsCount=0) # small pouch
         self.mouse.click()
         # This sequence will fill inventory with pure ess if our inventory is not already full
-        self.mouse.move_to(pure_ess.random_point(), knotsCount=0)
+        self.mouse.move_to(pure_ess.random_point(), mouseSpeed='fastest', knotsCount=0)
         self.mouse.click()
         # Fill small and medium pouch
         self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest', knotsCount=0) # small pouch
         self.mouse.click()
         # This sequence will fill inventory with pure ess if our inventory is not already full
-        self.mouse.move_to(pure_ess.random_point(), knotsCount=0)
+        self.mouse.move_to(pure_ess.random_point(), mouseSpeed='fastest', knotsCount=0)
         self.mouse.click()
-        while not api_m.get_is_inv_full():
-            time.sleep(0.5)
+        time.sleep(0.5)
         pag.press('esc')   
-        self.repair_pouches(api_m)
-
-    def click_fairy_ring(self):
-        fairy_ring = self.get_nearest_tag(clr.YELLOW)
-        if not self.mouseover_text(contains="Last"):
-            self.mouse.move_to(fairy_ring.random_point()) 
-        self.mouse.click()
+        time.sleep(0.5)
+        self.repair_pouches()
 
     def run_to_altar(self):
-        first_obstacle = self.get_nearest_tag(clr.GREEN)
-        while not first_obstacle:
-            first_obstacle = self.get_nearest_tag(clr.GREEN)
-            time.sleep(1)
-        self.mouse.move_to(first_obstacle.random_point()) 
-        self.mouse.click()
-        time.sleep(4.8)
-
-        second_obstacle = self.get_nearest_tag(clr.BLUE)
-        self.mouse.move_to(second_obstacle.random_point()) 
-        self.mouse.click()      
-
-        third_obstacle = self.get_nearest_tag(clr.RED)
-        while not third_obstacle:
-            third_obstacle = self.get_nearest_tag(clr.RED)
-            time.sleep(0.5)
-        self.mouse.move_to(third_obstacle.random_point()) 
-        self.mouse.click()
-        time.sleep(9.5)
-
-        fourth_obstacle = self.get_nearest_tag(clr.ORANGE)
-        self.mouse.move_to(fourth_obstacle.random_point()) 
-        self.mouse.click()
+        self.wait_until_color(color=clr.GREEN, timeout=10)
+        time.sleep(0.75) # Added because you cannot instantly click after coming from a fairy ring
+        self.click_color(color=clr.GREEN, contains="Enter") # First obstacle
+        time.sleep(5)
+        self.click_color(color=clr.BLUE, contains="Enter") # Second obstacle
+        self.wait_until_color(color=clr.RED, timeout=10)
+        self.click_color(color=clr.RED, contains="Enter") # Third obstacle
+        self.wait_until_color(color=clr.ORANGE, timeout=10)
+        self.click_color(color=clr.ORANGE, contains="Enter") # Fourth obstacle
 
     def enter_altar(self):
-        altar = self.get_nearest_tag(clr.CYAN)
-        if not self.mouseover_text(contains="Enter"):
-            self.mouse.move_to(altar.random_point()) 
-        self.mouse.click()
+        self.click_color(color=clr.CYAN, contains="Enter")
+        # altar = self.get_nearest_tag(clr.CYAN)
+        # self.mouse.move_to(altar.random_point(), mouseSpeed='fastest', knotsCount=0) 
+        # if self.mouseover_text(contains="Enter"):
+        #     self.mouse.click()
 
-    def click_altar(self, api_m: MorgHTTPSocket):
-        altar = self.get_nearest_tag(clr.RED)
-        while not altar:
-            time.sleep(1)
-            altar = self.get_nearest_tag(clr.RED)           
-        if altar:
-            self.log_msg("Crafting first set of essence..")
-            self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
-            self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 10)
+    def click_altar(self):
+        self.wait_until_color(color=clr.RED, timeout=10)
+        self.click_color(color=clr.RED, contains="Craft")
+        time.sleep(2.5)
         self.empty_pouches()
-        if altar := self.get_nearest_tag(clr.RED):
-            self.log_msg("Crafting second set of essence..")
-            self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
-            self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 2)
+        self.click_color(color=clr.RED, contains="Craft")
+        time.sleep(0.5)   
         self.empty_pouches()
-        if altar := self.get_nearest_tag(clr.RED):
-            self.log_msg("Crafting third set of essence..")
-            self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
-            self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 1)
+        self.click_color(color=clr.RED, contains="Craft")
+        time.sleep(0.5)     
 
     def empty_pouches(self):
         pag.keyDown('shift')
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        while not self.mouseover_text(contains="Empty", color=clr.OFF_WHITE):
+            self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
         pag.keyUp('shift')
 
     def return_to_bank(self):
+        count = 0
         # Bank with craft cape
-        self.mouse.move_to(self.win.inventory_slots[7].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
+        while True:
+            if count < 10:
+                self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # Place craft cape in 4th slot
+                if self.mouseover_text(contains="Teleport", color=clr.OFF_WHITE):
+                    self.mouse.click()
+                    break
+                else:
+                    count += 1
+                    time.sleep(0.5)
+            else:
+                self.log_msg("failed to find cape")
+                self.logout()
+                self.stop() 
 
     def start_run(self):
-        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest')
+        while not self.mouseover_text(contains="Tele to POH", color=clr.OFF_WHITE):
+            self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest')
         self.mouse.click()
-        fairy_ring = self.get_nearest_tag(clr.YELLOW)
-        while not fairy_ring:
-            fairy_ring = self.get_nearest_tag(clr.YELLOW)
-            time.sleep(0.5)
+        self.wait_until_color(color=clr.PURPLE, timeout=10)
 
         run_energy = self.get_run_energy()
         if run_energy < 25:
-            pool = self.get_nearest_tag(clr.PURPLE)
-            self.mouse.move_to(pool.random_point(), mouseSpeed='fast')
-            self.mouse.click()
+            self.click_color(color=clr.PURPLE, contains="Drink") # Click ornate pool
             time.sleep(3)
-        fairy_ring = self.get_nearest_tag(clr.YELLOW)
-        self.mouse.move_to(fairy_ring.random_point(), mouseSpeed='fast')
-        self.mouse.click()
+        self.click_color(color=clr.YELLOW, contains="Last") # Click fairy ring
 
     def deposit_all(self): 
         deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
@@ -207,7 +185,7 @@ class OSRStruebloods(OSRSBot):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click()  
 
-    def repair_pouches(self, api_m: MorgHTTPSocket):
+    def repair_pouches(self):
         colossal_rune_pouch_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "colossal_pouch.png")
         colossal_rune_pouch = imsearch.search_img_in_rect(colossal_rune_pouch_img, self.win.control_panel)
         if not colossal_rune_pouch:
@@ -225,7 +203,7 @@ class OSRStruebloods(OSRSBot):
             dark_mage = imsearch.search_img_in_rect(dark_mage_img, self.win.game_view)
             self.mouse.move_to(dark_mage.random_point())
             self.mouse.click()
-            api_m.wait_til_gained_xp('Magic', 10)
+            time.sleep(5)
             pag.press('space')
             time.sleep(1)
             pag.press('2')
@@ -243,7 +221,7 @@ class OSRStruebloods(OSRSBot):
             blood_ess_bank = imsearch.search_img_in_rect(blood_ess_bank_img, self.win.game_view)
             self.mouse.move_to(blood_ess_bank.random_point())
             self.mouse.right_click()
-            if withdraw_text := ocr.find_text("Withdraw-1", self.win.game_view, ocr.BOLD_12, [clr.WHITE, clr.OFF_ORANGE]):
+            if withdraw_text := ocr.find_text("Withdraw-1", self.win.game_view, ocr.BOLD_12, [clr.OFF_WHITE, clr.OFF_ORANGE]):
                 self.mouse.move_to(withdraw_text[0].random_point(), knotsCount=0)
                 self.mouse.click()
                 time.sleep(0.5)
@@ -253,3 +231,64 @@ class OSRStruebloods(OSRSBot):
                 time.sleep(0.5)
                 self.open_bank()
             time.sleep(1)
+            
+#This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.
+    def search_slot_28(self):
+        #define inventory_slots
+        self.__locate_inv_slots(self.win.control_panel)
+        # Create a rectangle for the 28th inventory slot
+        slot_28 = self.inventory_slots[27]
+
+        # Search for each item in the 28th inventory slot
+        item_path = imsearch.BOT_IMAGES.joinpath("Aarons_images", "emptyslot.PNG")
+        if search_img_in_rect(item_path, slot_28):
+            self.log_msg(f"Slot 28: Empty")
+            return False
+        self.log_msg(f"Slot 28: Full")
+        return True
+    
+#Make sure that this function is either imported from another file or defined in the same file before calling it.
+    def __locate_inv_slots(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each inventory slot relative to the control panel, storing it in the class property.
+        """
+        self.inventory_slots = []
+        slot_w, slot_h = 36, 32  # dimensions of a slot
+        gap_x, gap_y = 6, 4  # pixel gap between slots
+        y = 44 + cp.top  # start y relative to cp template
+        for _ in range(7):
+            x = 40 + cp.left  # start x relative to cp template
+            for _ in range(4):
+                self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+                x += slot_w + gap_x
+            y += slot_h + gap_y
+
+    def wait_until_color(self, color: clr, timeout: int = 10):
+        """this will wait till nearest tag is not none"""
+        time_start = time.time()
+        while True:
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+            if found := self.get_nearest_tag(color):
+                break
+            time.sleep(0.1)
+        return
+    
+    def click_color(self, color: clr, contains: str):
+        """This will click when the nearest tag is not none."""
+        count = 0
+        while True:
+            if count < 10:
+                if found := self.get_nearest_tag(color):
+                    self.mouse.move_to(found.random_point(), mouseSpeed='fastest')
+                    if self.mouseover_text(contains, color=clr.OFF_WHITE):
+                        self.mouse.click()
+                        break
+                else:
+                    count += 1
+                    time.sleep(1)
+            else:
+                self.log_msg("failed to find cape")
+                self.stop() 
+        return

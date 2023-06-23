@@ -148,15 +148,17 @@ class Mouse:
         return False
 
     def __calculate_knots(self, destination: tuple):
-        """
-        Calculate the knots to use in the Bezier curve based on distance.
-        Args:
-            destination: x, y tuple of the destination point.
-        """
-        # Calculate the distance between the start and end points
-        distance = np.sqrt((destination[0] - pag.position()[0]) ** 2 + (destination[1] - pag.position()[1]) ** 2)
-        res = round(distance / 200)
-        return min(res, 3)
+            """
+            Calculate the knots to use in the Bezier curve based on distance.
+            Args:
+                destination: x, y tuple of the destination point.
+            """
+            # Calculate the distance between the start and end points
+            distance = np.sqrt((destination[0] - pag.position()[0]) ** 2 + (destination[1] - pag.position()[1]) ** 2)
+            res = round(distance / 400)
+            #print(res,3)
+            return min(res, 3)
+            
 
     def __get_mouse_speed(self, speed: str) -> int:
         """
@@ -171,7 +173,7 @@ class Mouse:
         elif speed == "fast":
             min, max = 20, 40
         elif speed == "fastest":
-            min, max = 10, 15
+            min, max = 4, 10
         else:
             raise ValueError("Invalid mouse speed. Try 'slowest', 'slow', 'medium', 'fast', or 'fastest'.")
         return round(truncated_normal_sample(min, max))
