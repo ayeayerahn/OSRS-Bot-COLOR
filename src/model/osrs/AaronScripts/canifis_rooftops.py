@@ -94,6 +94,7 @@ class OSRScanifisrooftops(OSRSBot):
             counter += 1
             self.log_msg(f"Seconds elapsed: {counter}")
             time.sleep(1)
+        time.sleep(0.5)
         counter = 0
 
     def check_for_marks(self):
