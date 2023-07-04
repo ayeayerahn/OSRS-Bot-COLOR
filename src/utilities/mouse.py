@@ -156,7 +156,7 @@ class Mouse:
             # Calculate the distance between the start and end points
             distance = np.sqrt((destination[0] - pag.position()[0]) ** 2 + (destination[1] - pag.position()[1]) ** 2)
             res = round(distance / 400)
-            print(res,3)
+            #print(res,3)
             return min(res, 3)
             
 

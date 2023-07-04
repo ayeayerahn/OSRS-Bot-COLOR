@@ -81,11 +81,7 @@ class OSRStruebloods(OSRSBot):
         self.stop()
 
     def open_bank(self):
-        banker = self.get_nearest_tag(clr.CYAN)
-        if not self.mouseover_text(contains="Bank"):
-            self.mouse.move_to(banker.random_point()) 
-        if not self.mouse.click(check_red_click=True):
-            return self.open_bank()
+        self.click_color(color=clr.CYAN, contains="Use")
 
     def get_supplies(self):
         # Assumes pouches, active blood ess, bank tabs, and rune pouch are already in inventory
@@ -115,15 +111,15 @@ class OSRStruebloods(OSRSBot):
         self.repair_pouches()
 
     def run_to_altar(self):
-        self.wait_until_color(color=clr.GREEN, timeout=10)
+        self.wait_until_color(color=clr.OFF_GREEN, timeout=10)
         time.sleep(0.75) # Added because you cannot instantly click after coming from a fairy ring
-        self.click_color(color=clr.GREEN, contains="Enter") # First obstacle
+        self.click_color(color=clr.OFF_GREEN, contains="Enter") # First obstacle
         time.sleep(5)
         self.click_color(color=clr.BLUE, contains="Enter") # Second obstacle
         self.wait_until_color(color=clr.RED, timeout=10)
         self.click_color(color=clr.RED, contains="Enter") # Third obstacle
-        self.wait_until_color(color=clr.ORANGE, timeout=10)
-        self.click_color(color=clr.ORANGE, contains="Enter") # Fourth obstacle
+        self.wait_until_color(color=clr.OFF_ORANGE, timeout=10)
+        self.click_color(color=clr.OFF_ORANGE, contains="Enter") # Fourth obstacle
 
     def enter_altar(self):
         self.click_color(color=clr.CYAN, contains="Enter")
@@ -156,12 +152,13 @@ class OSRStruebloods(OSRSBot):
         while True:
             if count < 10:
                 self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # Place craft cape in 4th slot
+                time.sleep(0.2)
                 if self.mouseover_text(contains="Teleport", color=clr.OFF_WHITE):
                     self.mouse.click()
                     break
                 else:
                     count += 1
-                    time.sleep(0.5)
+                    time.sleep(1)
             else:
                 self.log_msg("failed to find cape")
                 self.logout()
@@ -282,6 +279,7 @@ class OSRStruebloods(OSRSBot):
             if count < 10:
                 if found := self.get_nearest_tag(color):
                     self.mouse.move_to(found.random_point(), mouseSpeed='fastest')
+                    time.sleep(0.2)
                     if self.mouseover_text(contains, color=clr.OFF_WHITE):
                         self.mouse.click()
                         break
