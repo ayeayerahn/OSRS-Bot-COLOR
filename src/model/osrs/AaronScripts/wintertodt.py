@@ -7,7 +7,6 @@ import pyautogui as pag
 from model.osrs.osrs_bot import OSRSBot
 from utilities.imagesearch import search_img_in_rect
 from utilities.geometry import Rectangle, Point
-from pathlib import Path
 
 
 class OSRSwintertodt(OSRSBot):
@@ -16,7 +15,7 @@ class OSRSwintertodt(OSRSBot):
         description = "<Bot description here.>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 1
+        self.running_time = 100
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -42,10 +41,12 @@ class OSRSwintertodt(OSRSBot):
         while time.time() - start_time < end_time:
 
         #1. Wait for the game to start
-            self.wait_till_game_start()
             self.cut_logs()
             self.fletch_logs()
             self.firemake()
+            self.return_to_bank()
+            self.bank_items()
+            self.return_to_start()
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -53,8 +54,70 @@ class OSRSwintertodt(OSRSBot):
         self.log_msg("Finished.")
         self.stop()
 
+    def return_to_start(self):
+        self.click_color(color=clr.PINK)
+        time.sleep(10)
+        self.click_color(color=clr.GREEN)
+        self.log_msg("Waiting for next game to begin..")
+        while True:
+            time.sleep(1)
+            if self.chatbox_text_RED_first_line(contains="Wintertodt"):
+                break
+            
+    def bank_items(self):
+        whole_cake_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake_bank.png")
+        whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
+        two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
+        one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
+        supply_crate_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "supply_crate.png")
+        whole_cake_inv = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
+        whole_cake_bank = imsearch.search_img_in_rect(whole_cake_bank_img, self.win.game_view)
+        two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
+        one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)  
+        supply_crate = imsearch.search_img_in_rect(supply_crate_img, self.win.control_panel)          
+        if one_thirds_cake:
+            one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
+            self.mouse.move_to(one_thirds_cake.random_point())
+            self.mouse.click()
+        # elif two_thirds_cake:
+        #     two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
+        #     self.mouse.move_to(two_thirds_cake.random_point())
+        #     self.mouse.click()
+        if supply_crate:
+            self.mouse.move_to(supply_crate.random_point())
+            self.mouse.click()
+        else:
+            self.log_msg("No supply crate found in your inventory.")
+        while True:
+            if whole_cake_inv and two_thirds_cake:
+                self.log_msg("We have enough food. Exiting bank.")
+                break
+            if whole_cake_bank:
+                self.mouse.move_to(whole_cake_bank.random_point())
+                self.mouse.click()
+                break
+            else:
+                self.log_msg("No more cakes to use as food. Stopping the script..")
+                self.stop()
+        time.sleep(1)
+        pag.press('esc')
+        time.sleep(1)
+
+    def return_to_bank(self):
+        self.log_msg("Returning to bank")
+        self.click_color(color=clr.PINK)
+        while True:
+            time.sleep(1)
+            if self.chatbox_text_BLACK(contains="subdued"):
+                break
+        self.click_color(color=clr.GREEN)
+        time.sleep(7)
+        self.click_color(color=clr.CYAN)
+        self.check_hp()
+        time.sleep(8)
+
     def wait_till_game_start(self):
-        self.wait_until_color(color=clr.GREEN, timeout=60)
+        self.wait_until_color(color=clr.YELLOW, timeout=60)
 
     def check_is_game_ended(self):
         if self.chatbox_text_BLACK(contains="Wintertodt"):
@@ -63,14 +126,22 @@ class OSRSwintertodt(OSRSBot):
     def cut_logs(self):
         if not self.search_slot_28():
             self.click_color(color=clr.CYAN) # Click on tree
-        while not self.search_slot_28():
+        #while not self.search_slot_28():
+            #time.sleep(1)
+        self.log_msg("Woodcutting")
+        while True:
             time.sleep(1)
+            if self.chatbox_text_RED(contains="Inventory"):
+                break
+        self.check_hp()
             
     def fletch_logs(self):
         knife_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "knife.png")
         knife = imsearch.search_img_in_rect(knife_img, self.win.control_panel)
         bruma_root_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "bruma_root.png")
         bruma_root = imsearch.search_img_in_rect(bruma_root_img, self.win.control_panel)
+        idle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "IDLE.png")
+        idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
         if bruma_root:
             if knife:
                 self.mouse.move_to(knife.random_point())
@@ -78,11 +149,13 @@ class OSRSwintertodt(OSRSBot):
                 self.mouse.move_to(bruma_root.random_point())
                 self.mouse.click()
         time.sleep(2)
+        self.log_msg("Fletching..")
         while bruma_root:
             bruma_root = imsearch.search_img_in_rect(bruma_root_img, self.win.control_panel)
-            self.log_msg("Still roots in inv. Sleeping..")
             time.sleep(1)
-            if self.chatbox_text_RED_first_line(contains="Fletching"):
+            idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
+            if idle:
+            # if self.chatbox_text_RED_first_line(contains="Fletching"):
                 time.sleep(0.5)
                 self.check_hp()
                 return self.fletch_logs()
@@ -96,44 +169,47 @@ class OSRSwintertodt(OSRSBot):
         two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
         one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
         current_hp = self.get_hp()
-        if current_hp < 8:
+        if current_hp <= 8:
             if one_thirds_cake:
+                one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
                 self.mouse.move_to(one_thirds_cake.random_point())
                 self.mouse.click()
             elif two_thirds_cake:
+                two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
                 self.mouse.move_to(two_thirds_cake.random_point())
                 self.mouse.click()
             elif whole_cake:
+                whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
                 self.mouse.move_to(whole_cake.random_point())
                 self.mouse.click()
 
     def firemake(self):
         bruma_kindling_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "bruma_kindling.png")
         bruma_kindling = imsearch.search_img_in_rect(bruma_kindling_img, self.win.control_panel)
-        self.wait_until_color(color=clr.GREEN)
-        self.click_color(color=clr.GREEN)
+        idle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "IDLE.png")
+        idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
+        if bruma_kindling:
+            self.click_color(color=clr.YELLOW)
+        time.sleep(3)
+        self.log_msg("Firemaking..")
         while bruma_kindling:
             bruma_kindling = imsearch.search_img_in_rect(bruma_kindling_img, self.win.control_panel)
-            self.log_msg("Firemaking..")
-            time.sleep(1)
-            if self.chatbox_text_RED_first_line(contains="Cold"):
-                self.log_msg("Took cold damage. Starting to firemake again.")
-                return self.firemake()
-            elif self.chatbox_text_RED_first_line(contains="Shattered"):
-                self.log_msg("The brazier broke. Starting to firemake again.")
-                return self.firemake()
-            elif self.chatbox_text_RED_first_line(contains="went out"):
+            time.sleep(0.5)
+            idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
+            if idle:
+                self.log_msg("Took damage.. checking health and firemaking until inv is empty.")
+                time.sleep(0.5)
+                self.check_hp()
                 return self.firemake()
         return
                 
-
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""
         count = 0
         while True:
             if count < 10:
                 if found := self.get_nearest_tag(color):
-                    self.mouse.move_to(found.random_point(), mouseSpeed='fastest')
+                    self.mouse.move_to(found.random_point())
                     self.mouse.click()
                     break
                 else:
