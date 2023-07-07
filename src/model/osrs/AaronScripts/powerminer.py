@@ -15,7 +15,7 @@ class OSRSpowerminer(OSRSBot):
         description = "This bot will power mine iron ore."
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 10
+        self.running_time = 1000
 
     def create_options(self):
         """

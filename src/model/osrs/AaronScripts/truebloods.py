@@ -277,6 +277,7 @@ class OSRStruebloods(OSRSBot):
         count = 0
         while True:
             if count < 10:
+                self.log_msg(f"Moving to {color}...")
                 if found := self.get_nearest_tag(color):
                     self.mouse.move_to(found.random_point(), mouseSpeed='fastest')
                     time.sleep(0.2)
@@ -287,6 +288,6 @@ class OSRStruebloods(OSRSBot):
                     count += 1
                     time.sleep(1)
             else:
-                self.log_msg("failed to find cape")
+                self.log_msg(f"failed to find {color} :(")
                 self.stop() 
         return
