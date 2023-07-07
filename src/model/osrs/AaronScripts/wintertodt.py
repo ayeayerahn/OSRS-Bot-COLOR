@@ -2,7 +2,6 @@ import time
 
 import utilities.color as clr
 import utilities.imagesearch as imsearch
-import utilities.ocr as ocr
 import pyautogui as pag
 from model.osrs.osrs_bot import OSRSBot
 from utilities.imagesearch import search_img_in_rect
@@ -15,7 +14,7 @@ class OSRSwintertodt(OSRSBot):
         description = "<Bot description here.>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 100
+        self.running_time = 1000
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -56,29 +55,34 @@ class OSRSwintertodt(OSRSBot):
 
     def return_to_start(self):
         self.click_color(color=clr.PINK)
-        time.sleep(10)
+        time.sleep(8)
         self.click_color(color=clr.GREEN)
         self.log_msg("Waiting for next game to begin..")
         while True:
             time.sleep(1)
             if self.chatbox_text_RED_first_line(contains="Wintertodt"):
+                time.sleep(2)
                 break
             
     def bank_items(self):
-        whole_cake_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake_bank.png")
-        whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
-        two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
-        one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
+        # whole_cake_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake_bank.png")
+        # whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
+        # two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
+        # one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
         supply_crate_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "supply_crate.png")
-        whole_cake_inv = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-        whole_cake_bank = imsearch.search_img_in_rect(whole_cake_bank_img, self.win.game_view)
-        two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-        one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)  
+        trout_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout_bank.png")
+        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
+        # whole_cake_inv = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
+        # whole_cake_bank = imsearch.search_img_in_rect(whole_cake_bank_img, self.win.game_view)
+        # two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
+        # one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)  
         supply_crate = imsearch.search_img_in_rect(supply_crate_img, self.win.control_panel)          
-        if one_thirds_cake:
-            one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
-            self.mouse.move_to(one_thirds_cake.random_point())
-            self.mouse.click()
+        trout_bank = imsearch.search_img_in_rect(trout_bank_img, self.win.game_view)          
+        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+        # if one_thirds_cake:
+        #     one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
+        #     self.mouse.move_to(one_thirds_cake.random_point())
+        #     self.mouse.click()
         # elif two_thirds_cake:
         #     two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
         #     self.mouse.move_to(two_thirds_cake.random_point())
@@ -89,15 +93,25 @@ class OSRSwintertodt(OSRSBot):
         else:
             self.log_msg("No supply crate found in your inventory.")
         while True:
-            if whole_cake_inv and two_thirds_cake:
+            if trout:
                 self.log_msg("We have enough food. Exiting bank.")
                 break
-            if whole_cake_bank:
-                self.mouse.move_to(whole_cake_bank.random_point())
+            elif trout_bank:
+                self.log_msg("Withdrawing one trout.")
+                self.mouse.move_to(trout_bank.random_point())
                 self.mouse.click()
                 break
+            # if whole_cake_inv and two_thirds_cake:
+            #     self.log_msg("We have enough food. Exiting bank.")
+            #     break
+            # elif whole_cake_inv:
+            #     break
+            # elif whole_cake_bank:
+            #     self.mouse.move_to(whole_cake_bank.random_point())
+            #     self.mouse.click()
+            #     break
             else:
-                self.log_msg("No more cakes to use as food. Stopping the script..")
+                self.log_msg("No more food. Stopping the script..")
                 self.stop()
         time.sleep(1)
         pag.press('esc')
@@ -155,33 +169,42 @@ class OSRSwintertodt(OSRSBot):
             time.sleep(1)
             idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
             if idle:
-            # if self.chatbox_text_RED_first_line(contains="Fletching"):
                 time.sleep(0.5)
                 self.check_hp()
                 return self.fletch_logs()
         self.log_msg("No roots left. Moving on.")
         
     def check_hp(self):
-        whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
-        two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
-        one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
-        whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-        two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-        one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
+        # whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
+        # two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
+        # one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
+        # whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
+        # two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
+        # one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
+        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
+        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
         current_hp = self.get_hp()
-        if current_hp <= 8:
-            if one_thirds_cake:
-                one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
-                self.mouse.move_to(one_thirds_cake.random_point())
+        if current_hp <= 6:
+            if trout:
+                # trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+                self.mouse.move_to(trout.random_point())
                 self.mouse.click()
-            elif two_thirds_cake:
-                two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-                self.mouse.move_to(two_thirds_cake.random_point())
-                self.mouse.click()
-            elif whole_cake:
-                whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-                self.mouse.move_to(whole_cake.random_point())
-                self.mouse.click()
+            #else:
+                #self.log_msg("HP is too low and out of food. Moving to a safe spot and exiting.")
+                #self.click_color(color=clr.PINK)
+                #self.stop()
+            # if one_thirds_cake:
+            #     one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
+            #     self.mouse.move_to(one_thirds_cake.random_point())
+            #     self.mouse.click()
+            # elif two_thirds_cake:
+            #     two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
+            #     self.mouse.move_to(two_thirds_cake.random_point())
+            #     self.mouse.click()
+            # elif whole_cake:
+            #     whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
+            #     self.mouse.move_to(whole_cake.random_point())
+            #     self.mouse.click()
 
     def firemake(self):
         bruma_kindling_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "bruma_kindling.png")
