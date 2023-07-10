@@ -157,6 +157,8 @@ class OSRSwintertodt(OSRSBot):
             return self.main_loop()
 
     def cut_logs(self):
+        idle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "IDLE.png")
+        idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
         woodcutting_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "woodcutting.png")
         woodcutting = imsearch.search_img_in_rect(woodcutting_img, self.win.game_view)        
         if not self.search_slot_28():
@@ -176,6 +178,9 @@ class OSRSwintertodt(OSRSBot):
         self.log_msg("Woodcutting")
         while True:
             time.sleep(0.5)
+            self.check_hp()
+            if idle:
+                return self.cut_logs()
             if self.chatbox_text_RED(contains="Inventory"):
                 break
         self.check_hp()
