@@ -114,8 +114,7 @@ class OSRSwintertodt(OSRSBot):
                     self.mouse.click()
                     time.sleep(0.5)
                     self.mouse.click() 
-                    if trout := imsearch.search_img_in_rect(trout_img, self.win.control_panel):
-                        break                   
+                    break                   
             # elif trout:
             #     self.log_msg("We have enough food. Exiting bank.")
             #     break
