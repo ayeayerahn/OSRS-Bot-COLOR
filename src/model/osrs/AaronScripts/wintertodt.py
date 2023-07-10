@@ -179,10 +179,13 @@ class OSRSwintertodt(OSRSBot):
         while True:
             time.sleep(0.5)
             self.check_hp()
-            if idle:
-                return self.cut_logs()
+            idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
             if self.chatbox_text_RED(contains="Inventory"):
                 break
+            if self.chatbox_text_BLACK_first_line(contains="seeps"):
+                self.check_hp()
+                if idle:
+                    return self.cut_logs()
         self.check_hp()
             
     def fletch_logs(self):
