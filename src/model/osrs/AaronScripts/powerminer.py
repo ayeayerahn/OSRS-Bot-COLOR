@@ -4,9 +4,10 @@ import utilities.api.item_ids as ids
 import utilities.color as clr
 import utilities.random_util as rd
 import pyautogui as pag
+import utilities.imagesearch as imsearch
 from model.osrs.osrs_bot import OSRSBot
-from utilities.api.morg_http_client import MorgHTTPSocket
-from utilities.api.status_socket import StatusSocket
+from utilities.imagesearch import search_img_in_rect
+from utilities.geometry import Rectangle, Point
 
 
 class OSRSpowerminer(OSRSBot):
@@ -18,20 +19,9 @@ class OSRSpowerminer(OSRSBot):
         self.running_time = 1000
 
     def create_options(self):
-        """
-        Use the OptionsBuilder to define the options for the bot. For each function call below,
-        we define the type of option we want to create, its key, a label for the option that the user will
-        see, and the possible values the user can select. The key is used in the save_options function to
-        unpack the dictionary of options after the user has selected them.
-        """
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
 
     def save_options(self, options: dict):
-        """
-        For each option in the dictionary, if it is an expected option, save the value as a property of the bot.
-        If any unexpected options are found, log a warning. If an option is missing, set the options_set flag to
-        False.
-        """
         for option in options:
             if option == "running_time":
                 self.running_time = options[option]
@@ -45,43 +35,23 @@ class OSRSpowerminer(OSRSBot):
         self.options_set = True
 
     def main_loop(self):
-        """
-        When implementing this function, you have the following responsibilities:
-        1. If you need to halt the bot from within this function, call `self.stop()`. You'll want to do this
-           when the bot has made a mistake, gets stuck, or a condition is met that requires the bot to stop.
-        2. Frequently call self.update_progress() and self.log_msg() to send information to the UI.
-        3. At the end of the main loop, make sure to call `self.stop()`.
-
-        Additional notes:
-        - Make use of Bot/RuneLiteBot member functions. There are many functions to simplify various actions.
-          Visit the Wiki for more.
-        - Using the available APIs is highly recommended. Some of all of the API tools may be unavailable for
-          select private servers. To see what the APIs can offer you, see here: https://github.com/kelltom/OSRS-Bot-COLOR/tree/main/src/utilities/api.
-          For usage, uncomment the `api_m` and/or `api_s` lines below, and use the `.` operator to access their
-          functions.
-        """
         # Setup APIs
-        api_m = MorgHTTPSocket()
+        # api_m = MorgHTTPSocket()
         # api_s = StatusSocket()
 
         # Main loop
         time.sleep(3)
-        pag.press('d')
+        # pag.press('d')
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
-            # -- Perform bot actions here --
-            # Code within this block will LOOP until the bot is stopped.
             spec_energy = self.get_special_energy()
             if spec_energy >= 100:
                 self.mouse.move_to(self.win.spec_orb.random_point())
                 self.mouse.click()
-            for i in range(20):
-                self.powermine(api_m)
-            ores = api_m.get_inv_item_indices(ids.ores)
-            gems = api_m.get_inv_item_indices(ids.gems)
-            self.drop(ores)
-            self.drop(gems)
+            self.powermine()
+            if self.search_slot_28():
+                self.drop_all(skip_rows=0, skip_slots=[3])
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -90,13 +60,73 @@ class OSRSpowerminer(OSRSBot):
         self.stop()
 
 
-    def powermine(self, api_m: MorgHTTPSocket):
-        iron_ore = self.get_all_tagged_in_rect(self.win.game_view, clr.YELLOW)
-        self.mouse.move_to(iron_ore[0].random_point(), mouseSpeed='fastest')
-        self.mouse.click()
-        api_m.wait_til_gained_xp("Mining", 5)
+    def powermine(self):
+        last_xp = self.get_total_xp()
+        counter = 0 
+        if found := self.get_nearest_tag(color=clr.YELLOW):
+            self.mouse.move_to(found.random_point(), mouseSpeed='fastest')
+            time.sleep(0.01)
+            self.mouse.click()
+        while counter < 15:
+            new_xp = self.get_total_xp()
+            if new_xp != last_xp:
+                break
+            counter += 1
+            self.log_msg(f"Seconds elapsed: {counter}")
+            time.sleep(0.1)
+        time.sleep(0.2)
+        counter = 0
+        
 
     def sleep(self, num1, num2):
         sleep_time = rd.fancy_normal_sample(num1, num2)   
         #self.log_msg(f"Sleeping for {sleep_time} seconds")     #Uncomment this out if you wish to see how many seconds the sleep is doing
         time.sleep(sleep_time) 
+        
+#This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.
+    def search_slot_28(self):
+        #define inventory_slots
+        self.__locate_inv_slots(self.win.control_panel)
+        # Create a rectangle for the 28th inventory slot
+        slot_28 = self.inventory_slots[27]
+
+        # Search for each item in the 28th inventory slot
+        item_path = imsearch.BOT_IMAGES.joinpath("Aarons_images", "emptyslot.PNG")
+        if search_img_in_rect(item_path, slot_28):
+            self.log_msg(f"Slot 28: Empty")
+            return False
+        self.log_msg(f"Slot 28: Full")
+        return True
+    
+#Make sure that this function is either imported from another file or defined in the same file before calling it.
+    def __locate_inv_slots(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each inventory slot relative to the control panel, storing it in the class property.
+        """
+        self.inventory_slots = []
+        slot_w, slot_h = 36, 32  # dimensions of a slot
+        gap_x, gap_y = 6, 4  # pixel gap between slots
+        y = 44 + cp.top  # start y relative to cp template
+        for _ in range(7):
+            x = 40 + cp.left  # start x relative to cp template
+            for _ in range(4):
+                self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+                x += slot_w + gap_x
+            y += slot_h + gap_y
+            
+    def click_color(self, color: clr):
+        """This will click when the nearest tag is not none."""
+        count = 0
+        while True:
+            if count < 10:
+                if found := self.get_nearest_tag(color):
+                    self.mouse.move_to(found.random_point())
+                    self.mouse.click()
+                    break
+                else:
+                    count += 1
+                    time.sleep(1)
+            else:
+                self.log_msg("failed to find cape")
+                self.stop() 
+        return
