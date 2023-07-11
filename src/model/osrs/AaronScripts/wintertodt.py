@@ -63,6 +63,9 @@ class OSRSwintertodt(OSRSBot):
             if self.chatbox_text_RED_first_line(contains="Wintertodt"):
                 time.sleep(2)
                 break
+            if self.chatbox_text_BLACK(contains="Kourend"):
+                time.sleep(2)
+                break
             
     def bank_items(self):
         # whole_cake_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake_bank.png")
@@ -92,15 +95,31 @@ class OSRSwintertodt(OSRSBot):
             self.mouse.click()
         else:
             self.log_msg("No supply crate found in your inventory.")
+        time.sleep(0.5)
         while True:
-            if trout:
-                self.log_msg("We have enough food. Exiting bank.")
-                break
-            elif trout_bank:
-                self.log_msg("Withdrawing one trout.")
-                self.mouse.move_to(trout_bank.random_point())
-                self.mouse.click()
-                break
+            if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[1]):
+                if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[0]):
+                    self.log_msg("We have at least two trout.. Exiting bank.")
+                    break
+                else:
+                    self.mouse.move_to(trout_bank.random_point())
+                    self.mouse.click()
+                    break
+            trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)                  
+            if not trout:
+                self.log_msg("No trout in your inventory.")
+                if trout_bank := imsearch.search_img_in_rect(trout_bank_img, self.win.game_view):
+                    self.log_msg("Withdrawing two trout.")
+                    self.mouse.move_to(trout_bank.random_point())
+                    self.mouse.click()
+                    time.sleep(0.5)
+                    self.mouse.click() 
+                    break                   
+            # elif trout:
+            #     self.log_msg("We have enough food. Exiting bank.")
+            #     break
+            # elif trout_bank:
+            #     break
             # if whole_cake_inv and two_thirds_cake:
             #     self.log_msg("We have enough food. Exiting bank.")
             #     break
@@ -138,15 +157,35 @@ class OSRSwintertodt(OSRSBot):
             return self.main_loop()
 
     def cut_logs(self):
+        idle_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "IDLE.png")
+        idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
+        woodcutting_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "woodcutting.png")
+        woodcutting = imsearch.search_img_in_rect(woodcutting_img, self.win.game_view)        
         if not self.search_slot_28():
             self.click_color(color=clr.CYAN) # Click on tree
-        #while not self.search_slot_28():
-            #time.sleep(1)
+        counter = 0
+        while True:
+            self.log_msg("Running to cut logs")
+            time.sleep(1)
+            woodcutting = imsearch.search_img_in_rect(woodcutting_img, self.win.game_view) 
+            if woodcutting:
+                break    
+            counter += 1
+            if counter == 10:
+                self.log_msg("We probably misclicked the tree. Trying again.")
+                return self.cut_logs()
+        counter = 0               
         self.log_msg("Woodcutting")
         while True:
-            time.sleep(1)
+            time.sleep(0.5)
+            self.check_hp()
+            idle = imsearch.search_img_in_rect(idle_img, self.win.game_view)
             if self.chatbox_text_RED(contains="Inventory"):
                 break
+            if self.chatbox_text_BLACK_first_line(contains="seeps"):
+                self.check_hp()
+                if idle:
+                    return self.cut_logs()
         self.check_hp()
             
     def fletch_logs(self):
