@@ -8,7 +8,7 @@ from utilities.imagesearch import search_img_in_rect
 from utilities.geometry import Rectangle, Point
 
 
-class OSRSwintertodt(OSRSBot):
+class OSRSwintertodt_main(OSRSBot):
     def __init__(self):
         bot_title = "Wintertodt"
         description = "<Bot description here.>"
@@ -69,67 +69,30 @@ class OSRSwintertodt(OSRSBot):
                 break
             
     def bank_items(self):
-        # whole_cake_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake_bank.png")
-        # whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
-        # two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
-        # one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
         supply_crate_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "supply_crate.png")
-        trout_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout_bank.png")
-        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
-        # whole_cake_inv = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-        # whole_cake_bank = imsearch.search_img_in_rect(whole_cake_bank_img, self.win.game_view)
-        # two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-        # one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)  
         supply_crate = imsearch.search_img_in_rect(supply_crate_img, self.win.control_panel)          
-        trout_bank = imsearch.search_img_in_rect(trout_bank_img, self.win.game_view)          
-        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)  
         shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
         shark_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark_bank.png")
         shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         shark_bank = imsearch.search_img_in_rect(shark_img, self.win.game_view)          
-        # if one_thirds_cake:
-        #     one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
-        #     self.mouse.move_to(one_thirds_cake.random_point())
-        #     self.mouse.click()
-        # elif two_thirds_cake:
-        #     two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-        #     self.mouse.move_to(two_thirds_cake.random_point())
-        #     self.mouse.click()
         if supply_crate:
             self.mouse.move_to(supply_crate.random_point())
             self.mouse.click()
         else:
             self.log_msg("No supply crate found in your inventory.")
-        time.sleep(0.5)
-        # while True:
-        #     if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[1]):
-        #         if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[0]):
-        #             self.log_msg("We have at least two trout.. Exiting bank.")
-        #             break
-        #         else:
-        #             self.mouse.move_to(trout_bank.random_point())
-        #             self.mouse.click()
-        #             break
-        #     trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)                  
-        #     if not trout:
-        #         self.log_msg("No trout in your inventory.")
-        #         if trout_bank := imsearch.search_img_in_rect(trout_bank_img, self.win.game_view):
-        #             self.log_msg("Withdrawing two trout.")
-        #             self.mouse.move_to(trout_bank.random_point())
-        #             self.mouse.click()
-        #             time.sleep(0.5)
-        #             self.mouse.click() 
-        #             break                   
+        time.sleep(0.5)          
         while True:
-            if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[1]):
-                if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[0]):
-                    self.log_msg("We have at least two shark.. Exiting bank.")
+            if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[2]):
+                if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[1]):
+                    self.log_msg("We have at least three shark.. Exiting bank.")
                     break
                 else:
                     self.mouse.move_to(shark_bank.random_point())
                     self.mouse.click()
+                    time.sleep(0.5)
+                    self.mouse.click() 
                     break
-            shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)                  
+            # shark = imsearch.search_img_in_rect(shark, self.win.control_panel)                  
             if not shark:
                 self.log_msg("No shark in your inventory.")
                 if shark_bank := imsearch.search_img_in_rect(shark_bank_img, self.win.game_view):
@@ -141,20 +104,6 @@ class OSRSwintertodt(OSRSBot):
                     time.sleep(0.5)
                     self.mouse.click() 
                     break                   
-            # elif trout:
-            #     self.log_msg("We have enough food. Exiting bank.")
-            #     break
-            # elif trout_bank:
-            #     break
-            # if whole_cake_inv and two_thirds_cake:
-            #     self.log_msg("We have enough food. Exiting bank.")
-            #     break
-            # elif whole_cake_inv:
-            #     break
-            # elif whole_cake_bank:
-            #     self.mouse.move_to(whole_cake_bank.random_point())
-            #     self.mouse.click()
-            #     break
             else:
                 self.log_msg("No more food. Stopping the script..")
                 self.stop()
@@ -166,13 +115,13 @@ class OSRSwintertodt(OSRSBot):
         self.log_msg("Returning to bank")
         self.click_color(color=clr.PINK)
         while True:
-            time.sleep(1)
             if self.chatbox_text_BLACK(contains="subdued"):
                 break
-        self.click_color(color=clr.GREEN)
-        time.sleep(7)
+            if self.chatbox_text_BLACK(contains="Kourend"):
+                break
+            time.sleep(1)
+        self.poh_tele()
         self.click_color(color=clr.CYAN)
-        self.check_hp()
         time.sleep(8)
 
     def wait_till_game_start(self):
@@ -240,41 +189,14 @@ class OSRSwintertodt(OSRSBot):
                 return self.fletch_logs()
         self.log_msg("No roots left. Moving on.")
         
-    def check_hp(self):
-        # whole_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "cake.png")
-        # two_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "2-3_cake.png")
-        # one_thirds_cake_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "slice_of_cake.png")
-        # whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-        # two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-        # one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
-        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
-        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+    def check_hp(self):         
         shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
         shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         current_hp = self.get_hp()
-        if current_hp <= 40:
+        if current_hp <= 25:
             if shark:
                 self.mouse.move_to(shark.random_point())
                 self.mouse.click()
-            if trout:
-                self.mouse.move_to(trout.random_point())
-                self.mouse.click()
-            #else:
-                #self.log_msg("HP is too low and out of food. Moving to a safe spot and exiting.")
-                #self.click_color(color=clr.PINK)
-                #self.stop()
-            # if one_thirds_cake:
-            #     one_thirds_cake = imsearch.search_img_in_rect(one_thirds_cake_img, self.win.control_panel)
-            #     self.mouse.move_to(one_thirds_cake.random_point())
-            #     self.mouse.click()
-            # elif two_thirds_cake:
-            #     two_thirds_cake = imsearch.search_img_in_rect(two_thirds_cake_img, self.win.control_panel)
-            #     self.mouse.move_to(two_thirds_cake.random_point())
-            #     self.mouse.click()
-            # elif whole_cake:
-            #     whole_cake = imsearch.search_img_in_rect(whole_cake_img, self.win.control_panel)
-            #     self.mouse.move_to(whole_cake.random_point())
-            #     self.mouse.click()
 
     def firemake(self):
         bruma_kindling_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "bruma_kindling.png")
@@ -355,3 +277,26 @@ class OSRSwintertodt(OSRSBot):
                 self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
                 x += slot_w + gap_x
             y += slot_h + gap_y
+            
+    def poh_tele(self):
+        count = 0
+        # Bank with craft cape
+        while True:
+            if count < 10:
+                self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # Place con cape in 4th slot
+                time.sleep(0.2)
+                if self.mouseover_text(contains="Tele", color=clr.OFF_WHITE):
+                    self.mouse.click()
+                    break
+                else:
+                    count += 1
+                    time.sleep(1)
+            else:
+                self.log_msg("failed to find cape")
+                self.logout()
+                self.stop()
+        self.wait_until_color(color=clr.PURPLE)
+        self.click_color(color=clr.PURPLE)
+        time.sleep(3)
+        self.click_color(color=clr.RED)
+        time.sleep(5)
