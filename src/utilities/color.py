@@ -61,6 +61,7 @@ LIGHT_PURPLE  = Color([74, 133, 245])
 LIGHT_BROWN = Color([166, 116, 80])
 LIGHT_CYAN = Color([0, 183, 255])
 TEXT_RED = Color([239,16,32])
+DODGY_NECKLACE_RED = Color([255, 255, 1])
 TEXT_GREEN = Color([6, 96, 12])
 
 """Colors for use with semi-transparent text"""
