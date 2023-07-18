@@ -68,15 +68,15 @@ class OSRSardyknights(OSRSBot):
                 #self.log_msg("Mouse text NOT found")
                 self.mouse.move_to(knight.random_point())
                 self.mouse.click()
-            if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
-                dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
-                if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
-                    self.log_msg("Equiping another dodgy necklace.")
-                    self.mouse.move_to(dodgy_necklace.random_point())
-                    self.mouse.click()
-                else:
-                    self.log_msg("We're out of dodgy necklaces.")
-                    return self.main_loop()
+            # if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
+            #     dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
+            #     if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
+            #         self.log_msg("Equiping another dodgy necklace.")
+            #         self.mouse.move_to(dodgy_necklace.random_point())
+            #         self.mouse.click()
+            #     else:
+            #         self.log_msg("We're out of dodgy necklaces.")
+            #         return self.main_loop()
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -85,21 +85,22 @@ class OSRSardyknights(OSRSBot):
         self.stop()
                  
     def check_hp(self):
-        # trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
-        # trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
-        shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
-        shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
+        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
+        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+        # shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
+        # shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         current_hp = self.get_hp()
-        if current_hp <= 40:
-            if shark:
-                self.mouse.move_to(shark.random_point())
+        # if current_hp <= 40:
+            # if shark:
+            #     self.mouse.move_to(shark.random_point())
+            #     self.mouse.click()
+        if current_hp <= 15:
+            if trout:
+                self.mouse.move_to(trout.random_point())
                 self.mouse.click()
             else:
                 self.log_msg("Ran out of food. Stopping script.")
                 self.stop()
-            # if trout:
-            #     self.mouse.move_to(trout.random_point())
-            #     self.mouse.click()
                            
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""
