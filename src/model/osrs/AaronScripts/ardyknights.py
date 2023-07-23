@@ -3,9 +3,11 @@ import time
 import utilities.color as clr
 import utilities.imagesearch as imsearch
 import pyautogui as pag
+import utilities.ocr as ocr
 from model.osrs.osrs_bot import OSRSBot
 from utilities.imagesearch import search_img_in_rect
 from utilities.geometry import Rectangle, Point
+from pathlib import Path
 
 
 class OSRSardyknights(OSRSBot):
@@ -39,35 +41,31 @@ class OSRSardyknights(OSRSBot):
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
             counter = 0
-            knight = self.get_nearest_tag(color=clr.CYAN)
-            if self.mouseover_text(contains="Pickpocket"):
-                #self.log_msg("Mouse text found")
-                self.mouse.click()
+            self.click_knight()
+            while True:
+                if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
+                    self.log_msg("Pouch is full.")
+                    self.mouse.move_to(self.win.inventory_slots[0].random_point())
+                    self.mouse.click()
+                    break
+                elif self.chatbox_text_BLACK_first_line("rogue") or self.chatbox_text_BLACK_first_line("You pick"):
+                    #self.log_msg("Success")
+                    break
+                elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
+                    #self.log_msg("Fail")
+                    self.check_hp()
+                    time.sleep(4)
+                    break
+                counter += 1
                 time.sleep(0.5)
-                while True:
-                    if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
-                        self.log_msg("Pouch is full.")
-                        self.mouse.move_to(self.win.inventory_slots[0].random_point())
-                        self.mouse.click()
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="pick"):
-                        #self.log_msg("Success")
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
-                        #self.log_msg("Fail")
-                        self.check_hp()
-                        time.sleep(3)
-                        break
-                    counter += 1
-                    time.sleep(1)
-                    if counter == 5:
-                        self.log_msg("Maybe we misclicked off the knight.")
-                        break
+                if counter == 10:
+                    self.log_msg("Maybe we misclicked off the knight.")
+                    break
                         
-            else:
-                #self.log_msg("Mouse text NOT found")
-                self.mouse.move_to(knight.random_point())
-                self.mouse.click()
+            # else:
+            #     #self.log_msg("Mouse text NOT found")
+            #     self.mouse.move_to(knight.random_point())
+            #     self.mouse.click()
             # if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
             #     dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
             #     if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
@@ -83,10 +81,29 @@ class OSRSardyknights(OSRSBot):
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
+        
+    def click_knight(self):
+        count = 0
+        while True:
+            if count < 10:
+                knight = self.get_nearest_tag(clr.CYAN)
+                if self.mouseover_text(contains="Pickpocket"):
+                    self.mouse.click()
+                    time.sleep(0.4)
+                    break
+                else:
+                    self.mouse.move_to(knight.random_point())
+                    continue
+            else:
+                count += 1
+                time.sleep(1)
+                if count == 10:
+                    self.log_msg("failed to find knight")
+                    self.stop()           
                  
     def check_hp(self):
-        trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
-        trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+        tuna_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "tuna.png")
+        tuna = imsearch.search_img_in_rect(tuna_img, self.win.control_panel)          
         # shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
         # shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         current_hp = self.get_hp()
@@ -95,12 +112,52 @@ class OSRSardyknights(OSRSBot):
             #     self.mouse.move_to(shark.random_point())
             #     self.mouse.click()
         if current_hp <= 15:
-            if trout:
-                self.mouse.move_to(trout.random_point())
+            if tuna:
+                self.mouse.move_to(tuna.random_point())
                 self.mouse.click()
             else:
-                self.log_msg("Ran out of food. Stopping script.")
-                self.stop()
+                self.log_msg("Out of food. Banking for more.")
+                time.sleep(5)
+                self.open_bank()
+                return self.main_loop()
+                # self.log_msg("Ran out of food. Stopping script.")
+                # self.stop()
+                
+    def open_bank(self):
+        tuna_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "tuna_bank.png")
+        count = 0
+        while True:
+            if count < 10:
+                if found := self.get_nearest_tag(clr.YELLOW):
+                    self.mouse.move_to(found.random_point())
+                    break
+                else:
+                    count += 1
+                    time.sleep(1)
+            else:
+                self.log_msg("failed to find bank")
+                self.stop() 
+        self.mouse.right_click()
+        if bank_text := ocr.find_text("Bank Bank", self.win.game_view, ocr.BOLD_12, [clr.WHITE, clr.CYAN]):
+            self.mouse.move_to(bank_text[0].random_point(), knotsCount=0)
+            self.mouse.click()
+        tuna = self.wait_until_img(tuna_bank_img, self.win.game_view) # Wait until raw tunaies are seen
+        time.sleep(1)
+        if self.search_slot_28():
+            self.deposit_all()
+        self.mouse.move_to(tuna.random_point())
+        if self.mouseover_text(contains="Release"):
+            self.log_msg("Ran out of food. Stopping script.")
+            self.stop()
+        self.mouse.click()
+        pag.press("escape")
+        time.sleep(1)
+        
+    def deposit_all(self): 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
+        if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
+            self.mouse.move_to(deposit.random_point())   
+            self.mouse.click() 
                            
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""
@@ -161,3 +218,14 @@ class OSRSardyknights(OSRSBot):
                 self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
                 x += slot_w + gap_x
             y += slot_h + gap_y
+            
+    def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
+        """this will wait till img shows up in screen"""
+        time_start = time.time()
+        while True:
+            if found :=imsearch.search_img_in_rect(img, screen):
+                break
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+        return found
