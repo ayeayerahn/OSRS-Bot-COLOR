@@ -3,16 +3,15 @@ import time
 import utilities.color as clr
 import utilities.imagesearch as imsearch
 import pyautogui as pag
-import utilities.ocr as ocr
 from model.osrs.osrs_bot import OSRSBot
 from utilities.imagesearch import search_img_in_rect
 from utilities.geometry import Rectangle, Point
 from pathlib import Path
 
 
-class OSRSardyknights(OSRSBot):
+class OSRScooking(OSRSBot):
     def __init__(self):
-        bot_title = "Ardy Knights"
+        bot_title = "Cooker"
         description = "<Bot description here.>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
@@ -39,73 +38,39 @@ class OSRSardyknights(OSRSBot):
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
+
         while time.time() - start_time < end_time:
-            counter = 0
-            knight = self.get_nearest_tag(color=clr.CYAN)
-            if self.mouseover_text(contains="Pickpocket"):
-                #self.log_msg("Mouse text found")
-                self.mouse.click()
-                time.sleep(0.5)
-                while True:
-                    if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
-                        self.log_msg("Pouch is full.")
-                        self.mouse.move_to(self.win.inventory_slots[0].random_point())
-                        self.mouse.click()
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="pick"):
-                        #self.log_msg("Success")
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
-                        #self.log_msg("Fail")
-                        self.check_hp()
-                        time.sleep(3)
-                        break
-                    counter += 1
-                    time.sleep(1)
-                    if counter == 5:
-                        self.log_msg("Maybe we misclicked off the knight.")
-                        break
-                        
-            else:
-                #self.log_msg("Mouse text NOT found")
-                self.mouse.move_to(knight.random_point())
-                self.mouse.click()
-            if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
-                dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
-                if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
-                    self.log_msg("Equiping another dodgy necklace.")
-                    self.mouse.move_to(dodgy_necklace.random_point())
-                    self.mouse.click()
-                else:
-                    self.log_msg("We're out of dodgy necklaces.")
-                    return self.main_loop()
+            self.open_bank()
+            self.click_color(clr.YELLOW)
+            time.sleep(3)
+            pag.press("space")
+            time.sleep(66)
 
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.log_msg("Finished.")
-        self.stop()
-                 
-    def check_hp(self):
-        # trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
-        # trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
-        shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
-        shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
-        current_hp = self.get_hp()
-        # if current_hp <= 40:
-            # if shark:
-            #     self.mouse.move_to(shark.random_point())
-            #     self.mouse.click()
-        if current_hp <= 15:
-            if tuna:
-                self.mouse.move_to(tuna.random_point())
-                self.mouse.click()
-            else:
-                self.log_msg("Ran out of food. Stopping script.")
-                self.stop()
-            # if trout:
-            #     self.mouse.move_to(trout.random_point())
-            #     self.mouse.click()
+        self.stop()                 
+
+    def open_bank(self):
+        raw_lobster_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "raw_lobster_bank.png")
+        self.click_color(clr.CYAN) # Bank chest marked cyan
+        raw_lobster = self.wait_until_img(raw_lobster_bank_img, self.win.game_view) # Wait until raw lobsteries are seen
+        time.sleep(1)
+        if self.search_slot_28():
+            self.deposit_all()
+        self.mouse.move_to(raw_lobster.random_point())
+        if self.mouseover_text(contains="Release"):
+            self.log_msg("Ran out of food. Stopping script.")
+            self.stop()
+        self.mouse.click()
+        pag.press("escape")
+        
+    def deposit_all(self): 
+        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
+        if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
+            self.mouse.move_to(deposit.random_point())   
+            self.mouse.click() 
                            
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""
@@ -123,6 +88,17 @@ class OSRSardyknights(OSRSBot):
                 self.log_msg("failed to find cape")
                 self.stop() 
         return
+
+    def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
+        """this will wait till img shows up in screen"""
+        time_start = time.time()
+        while True:
+            if found :=imsearch.search_img_in_rect(img, screen):
+                break
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+        return found
 
     def wait_until_color(self, color: clr, timeout: int = 10):
         """this will wait till nearest tag is not none"""
@@ -166,14 +142,3 @@ class OSRSardyknights(OSRSBot):
                 self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
                 x += slot_w + gap_x
             y += slot_h + gap_y
-            
-    def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
-        """this will wait till img shows up in screen"""
-        time_start = time.time()
-        while True:
-            if found :=imsearch.search_img_in_rect(img, screen):
-                break
-            if time.time() - time_start > timeout:
-                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
-                self.stop()
-        return found
