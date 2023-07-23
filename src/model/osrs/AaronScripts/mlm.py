@@ -82,6 +82,9 @@ class OSRSmlm(OSRSBot):
         while not self.chatbox_text_BLACK_first_line("swing"):
             time.sleep(1)
             counter += 1
+            if self.chatbox_text_QUEST(contains="inventory"):
+                self.log_msg("Inventory full.")
+                break
             if counter == 10:
                 return self.mine_ore()
         
@@ -91,7 +94,8 @@ class OSRSmlm(OSRSBot):
         while True:
             if self.chatbox_text_BLACK(contains="ore is ready to be collected"):
                 break
-            if self.chatbox_text_QUEST(contains="The"):
+            if self.chatbox_text_QUEST(contains="The"): # Wheels are broken
+                time.sleep(1)
                 return self.repair_wheel()
             if self.chatbox_text_QUEST(contains="put in the hopper"):
                 return self.bank_ores()
@@ -111,6 +115,7 @@ class OSRSmlm(OSRSBot):
             if counter == 10:
                 self.log_msg("Maybe we misclicked the collect sack.")
                 return self.collect_ore()   
+        time.sleep(1)
 
     def repair_wheel(self):
         wheel = self.get_nearest_tag(clr.PINK)
@@ -141,6 +146,18 @@ class OSRSmlm(OSRSBot):
             else:
                 self.log_msg("failed to find cape")
                 self.stop() 
+        return
+
+    def wait_until_color(self, color: clr, timeout: int = 10):
+        """this will wait till nearest tag is not none"""
+        time_start = time.time()
+        while True:
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+            if found := self.get_nearest_tag(color):
+                break
+            time.sleep(0.1)
         return
     
 #This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.

@@ -97,8 +97,8 @@ class OSRSardyknights(OSRSBot):
             #     self.mouse.move_to(shark.random_point())
             #     self.mouse.click()
         if current_hp <= 15:
-            if tuna:
-                self.mouse.move_to(tuna.random_point())
+            if shark:
+                self.mouse.move_to(shark.random_point())
                 self.mouse.click()
             else:
                 self.log_msg("Ran out of food. Stopping script.")
