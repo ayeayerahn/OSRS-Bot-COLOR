@@ -82,6 +82,9 @@ class OSRSmlm(OSRSBot):
         while not self.chatbox_text_BLACK_first_line("swing"):
             time.sleep(1)
             counter += 1
+            if self.chatbox_text_QUEST(contains="inventory"):
+                self.log_msg("Inventory full.")
+                break
             if counter == 10:
                 return self.mine_ore()
         
@@ -91,7 +94,8 @@ class OSRSmlm(OSRSBot):
         while True:
             if self.chatbox_text_BLACK(contains="ore is ready to be collected"):
                 break
-            if self.chatbox_text_QUEST(contains="The"):
+            if self.chatbox_text_QUEST(contains="The"): # Wheels are broken
+                time.sleep(1)
                 return self.repair_wheel()
             if self.chatbox_text_QUEST(contains="put in the hopper"):
                 return self.bank_ores()
@@ -110,7 +114,8 @@ class OSRSmlm(OSRSBot):
             time.sleep(1)
             if counter == 10:
                 self.log_msg("Maybe we misclicked the collect sack.")
-                return self.collect_ore()   
+                return self.collect_ore()  
+        time.sleep(1) 
 
     def repair_wheel(self):
         wheel = self.get_nearest_tag(clr.PINK)

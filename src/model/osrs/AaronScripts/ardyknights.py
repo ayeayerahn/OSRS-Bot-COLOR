@@ -54,18 +54,13 @@ class OSRSardyknights(OSRSBot):
                 elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
                     #self.log_msg("Fail")
                     self.check_hp()
-                    time.sleep(4)
+                    time.sleep(3)
                     break
                 counter += 1
-                time.sleep(0.5)
-                if counter == 10:
+                time.sleep(1)
+                if counter == 5:
                     self.log_msg("Maybe we misclicked off the knight.")
                     break
-                        
-            # else:
-            #     #self.log_msg("Mouse text NOT found")
-            #     self.mouse.move_to(knight.random_point())
-            #     self.mouse.click()
             # if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
             #     dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
             #     if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
