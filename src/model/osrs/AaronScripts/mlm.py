@@ -114,8 +114,8 @@ class OSRSmlm(OSRSBot):
             time.sleep(1)
             if counter == 10:
                 self.log_msg("Maybe we misclicked the collect sack.")
-                return self.collect_ore()   
-        time.sleep(1)
+                return self.collect_ore()  
+        time.sleep(1) 
 
     def repair_wheel(self):
         wheel = self.get_nearest_tag(clr.PINK)
