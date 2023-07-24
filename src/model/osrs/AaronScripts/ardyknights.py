@@ -70,89 +70,71 @@ class OSRSardyknights(OSRSBot):
             #     else:
             #         self.log_msg("We're out of dodgy necklaces.")
             #         return self.main_loop()
+            knight = self.get_nearest_tag(color=clr.CYAN)
+            if self.mouseover_text(contains="Pickpocket"):
+                #self.log_msg("Mouse text found")
+                self.mouse.click()
+                time.sleep(0.5)
+                while True:
+                    if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
+                        self.log_msg("Pouch is full.")
+                        self.mouse.move_to(self.win.inventory_slots[0].random_point())
+                        self.mouse.click()
+                        break
+                    elif self.chatbox_text_BLACK_first_line(contains="pick"):
+                        #self.log_msg("Success")
+                        break
+                    elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
+                        #self.log_msg("Fail")
+                        self.check_hp()
+                        time.sleep(3)
+                        break
+                    counter += 1
+                    time.sleep(1)
+                    if counter == 5:
+                        self.log_msg("Maybe we misclicked off the knight.")
+                        break
+                        
+            else:
+                #self.log_msg("Mouse text NOT found")
+                self.mouse.move_to(knight.random_point())
+                self.mouse.click()
+            if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
+                dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
+                if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
+                    self.log_msg("Equiping another dodgy necklace.")
+                    self.mouse.move_to(dodgy_necklace.random_point())
+                    self.mouse.click()
+                else:
+                    self.log_msg("We're out of dodgy necklaces.")
+                    return self.main_loop()
 
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
-        
-    def click_knight(self):
-        count = 0
-        while True:
-            if count < 10:
-                knight = self.get_nearest_tag(clr.CYAN)
-                if self.mouseover_text(contains="Pickpocket"):
-                    self.mouse.click()
-                    time.sleep(0.4)
-                    break
-                else:
-                    self.mouse.move_to(knight.random_point())
-                    continue
-            else:
-                count += 1
-                time.sleep(1)
-                if count == 10:
-                    self.log_msg("failed to find knight")
-                    self.stop()           
                  
     def check_hp(self):
-        tuna_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "tuna.png")
-        tuna = imsearch.search_img_in_rect(tuna_img, self.win.control_panel)          
-        # shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
-        # shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
+        # trout_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "trout.png")
+        # trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)          
+        shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
+        shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         current_hp = self.get_hp()
         # if current_hp <= 40:
             # if shark:
             #     self.mouse.move_to(shark.random_point())
             #     self.mouse.click()
         if current_hp <= 15:
-            if tuna:
-                self.mouse.move_to(tuna.random_point())
+            if shark:
+                self.mouse.move_to(shark.random_point())
                 self.mouse.click()
             else:
-                self.log_msg("Out of food. Banking for more.")
-                time.sleep(5)
-                self.open_bank()
-                return self.main_loop()
-                # self.log_msg("Ran out of food. Stopping script.")
-                # self.stop()
-                
-    def open_bank(self):
-        tuna_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "tuna_bank.png")
-        count = 0
-        while True:
-            if count < 10:
-                if found := self.get_nearest_tag(clr.YELLOW):
-                    self.mouse.move_to(found.random_point())
-                    break
-                else:
-                    count += 1
-                    time.sleep(1)
-            else:
-                self.log_msg("failed to find bank")
-                self.stop() 
-        self.mouse.right_click()
-        if bank_text := ocr.find_text("Bank Bank", self.win.game_view, ocr.BOLD_12, [clr.WHITE, clr.CYAN]):
-            self.mouse.move_to(bank_text[0].random_point(), knotsCount=0)
-            self.mouse.click()
-        tuna = self.wait_until_img(tuna_bank_img, self.win.game_view) # Wait until raw tunaies are seen
-        time.sleep(1)
-        if self.search_slot_28():
-            self.deposit_all()
-        self.mouse.move_to(tuna.random_point())
-        if self.mouseover_text(contains="Release"):
-            self.log_msg("Ran out of food. Stopping script.")
-            self.stop()
-        self.mouse.click()
-        pag.press("escape")
-        time.sleep(1)
-        
-    def deposit_all(self): 
-        deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
-        if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
-            self.mouse.move_to(deposit.random_point())   
-            self.mouse.click() 
+                self.log_msg("Ran out of food. Stopping script.")
+                self.stop()
+            # if trout:
+            #     self.mouse.move_to(trout.random_point())
+            #     self.mouse.click()
                            
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""

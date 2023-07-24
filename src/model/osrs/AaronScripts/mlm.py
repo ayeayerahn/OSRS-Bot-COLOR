@@ -147,6 +147,18 @@ class OSRSmlm(OSRSBot):
                 self.log_msg("failed to find cape")
                 self.stop() 
         return
+
+    def wait_until_color(self, color: clr, timeout: int = 10):
+        """this will wait till nearest tag is not none"""
+        time_start = time.time()
+        while True:
+            if time.time() - time_start > timeout:
+                self.log_msg(f"We've been waiting for {timeout} seconds, something is wrong...stopping.")
+                self.stop()
+            if found := self.get_nearest_tag(color):
+                break
+            time.sleep(0.1)
+        return
     
 #This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.
     def search_slot_28(self):
