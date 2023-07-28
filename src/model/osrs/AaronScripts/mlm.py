@@ -16,7 +16,7 @@ class OSRSmlm(OSRSBot):
         description = "<Bot description here.>"
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
-        self.running_time = 1000
+        self.running_time = 1
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -35,13 +35,17 @@ class OSRSmlm(OSRSBot):
         self.options_set = True
 
     def main_loop(self):
-
+        start_exp = self.get_total_xp()
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
             # Mine sequence
             while not self.search_slot_28():
+                spec_energy = self.get_special_energy()
+                if spec_energy >= 100:
+                    self.mouse.move_to(self.win.spec_orb.random_point())
+                    self.mouse.click()
                 self.mine_ore()
                 counter = 0
                 while counter < 60:
@@ -65,7 +69,11 @@ class OSRSmlm(OSRSBot):
 
         self.update_progress(1)
         self.log_msg("Finished.")
-        self.stop()   
+        # self.stop()   
+        end_exp = self.get_total_xp()
+        total_exp_gained = end_exp - start_exp
+        self.log_msg(f"Total exp gained: {total_exp_gained}")
+        self.stop()
         
     def bank_ores(self):    
         self.click_color(clr.CYAN)
@@ -189,4 +197,10 @@ class OSRSmlm(OSRSBot):
             for _ in range(4):
                 self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
                 x += slot_w + gap_x
-            y += slot_h + gap_y
+            y += slot_h + gap_y       
+            
+    def end_run(self):
+        end_exp = self.get_total_xp()
+        total_exp_gained = end_exp - start
+        self.log_msg(f"Total exp gained: {total_exp_gained}")
+        self.stop()

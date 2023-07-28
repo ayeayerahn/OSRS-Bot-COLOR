@@ -45,35 +45,26 @@ class OSRSardyknights(OSRSBot):
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:  
             counter = 0
-            knight = self.get_nearest_tag(color=clr.CYAN)
-            if self.mouseover_text(contains="Pickpocket"):
-                #self.log_msg("Mouse text found")
-                self.mouse.click()
-                time.sleep(0.5)
-                while True:
-                    if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
-                        self.log_msg("Pouch is full.")
-                        self.mouse.move_to(self.win.inventory_slots[0].random_point())
-                        self.mouse.click()
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="pick"):
-                        #self.log_msg("Success")
-                        break
-                    elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
-                        #self.log_msg("Fail")
-                        self.check_hp()
-                        time.sleep(3)
-                        break
-                    counter += 1
-                    time.sleep(1)
-                    if counter == 5:
-                        self.log_msg("Maybe we misclicked off the knight.")
-                        break
-                        
-            else:
-                #self.log_msg("Mouse text NOT found")
-                self.mouse.move_to(knight.random_point())
-                self.mouse.click()
+            self.click_knight()
+            while True:
+                if self.chatbox_text_BLACK_first_line(contains="continue"): # Full coin pouch
+                    self.log_msg("Pouch is full.")
+                    self.mouse.move_to(self.win.inventory_slots[0].random_point())
+                    self.mouse.click()
+                    break
+                elif self.chatbox_text_BLACK_first_line(contains="pick") or self.chatbox_text_BLACK_first_line(contains="rogue"):
+                    #self.log_msg("Success")
+                    break
+                elif self.chatbox_text_BLACK_first_line(contains="stunned") or self.chatbox_text_BLACK_first_line(contains="fail") or self.chatbox_text_BLACK_first_line(contains="left"): # failure messages
+                    #self.log_msg("Fail")
+                    self.check_hp()
+                    time.sleep(3)
+                    break
+                counter += 1
+                time.sleep(1)
+                if counter == 5:
+                    self.log_msg("Maybe we misclicked off the knight.")
+                    break
             if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
                 dodgy_necklace_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "dodgy_necklace.png")
                 if dodgy_necklace := imsearch.search_img_in_rect(dodgy_necklace_inv_img, self.win.control_panel):
@@ -119,7 +110,7 @@ class OSRSardyknights(OSRSBot):
                     break
                 else:
                     self.mouse.move_to(knight.random_point())
-                    continue
+                    # continue
             else:
                 count += 1
                 time.sleep(1)
