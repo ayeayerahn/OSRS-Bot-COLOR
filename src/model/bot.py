@@ -449,8 +449,8 @@ class Bot(ABC):
             If args are left blank, returns the text in the chatbox.
         """
         if contains is None:
-            return ocr.extract_text(self.win.chat, ocr.PLAIN_12, clr.RED)
-        if ocr.find_text(contains, self.win.chat, ocr.PLAIN_12, clr.RED):
+            return ocr.extract_text(self.win.chat_first_line, ocr.PLAIN_12, clr.RED)
+        if ocr.find_text(contains, self.win.chat_first_line, ocr.PLAIN_12, clr.RED):
             return True
         
     def chatbox_text_BLACK(self, contains: str = None) -> Union[bool, str]:

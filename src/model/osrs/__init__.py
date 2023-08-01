@@ -16,3 +16,5 @@ from.AaronScripts.truebloods import OSRStruebloods
 from .AaronScripts.mlm import OSRSmlm
 from .AaronScripts.ectofuntus import OSRSectofuntus
 from .AaronScripts.gilded_altar import OSRSgildedaltar
+from .AaronScripts.wines import OSRSwines
+from .AaronScripts.potion_maker import OSRSpotionmaker

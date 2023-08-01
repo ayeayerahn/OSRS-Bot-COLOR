@@ -92,12 +92,6 @@ class OSRSardyknights(OSRSBot):
             food_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "tuna.png")
 
         return food_img
-    
-    # def get_food_bank_img(self):
-    #     if self.food_to_use == 'Shark':
-    #         food_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark_bank.png")
-        
-    #     return food_bank_img
 
     def click_knight(self):
         count = 0
