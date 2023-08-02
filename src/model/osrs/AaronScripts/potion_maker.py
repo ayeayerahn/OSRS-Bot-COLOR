@@ -18,7 +18,7 @@ class OSRSpotionmaker(AaronFunctions):
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
         self.running_time = 1
-        self.potion_list = ['Prayer', 'Super Restore']
+        self.potion_list = ['Prayer', 'Super Restore', 'Stamina']
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -62,6 +62,8 @@ class OSRSpotionmaker(AaronFunctions):
             primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ranarr_potion_(unf)_bank.png")
         elif self.potion_to_make == 'Super Restore':
             primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "snapdragon_potion_(unf)_bank.png")
+        elif self.potion_to_make == 'Stamina':
+            primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_energy(4).png")
         return primary_bank_img
     
     def get_secondary_bank_img(self):
@@ -69,6 +71,8 @@ class OSRSpotionmaker(AaronFunctions):
             secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "snape_grass_bank.png")
         elif self.potion_to_make == 'Super Restore':
             secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "red_spiders'_eggs_bank.png")
+        elif self.potion_to_make == 'Stamina':
+            secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "amylase_crystal_bank.png")
 
         return secondary_bank_img 
     
@@ -125,8 +129,7 @@ class OSRSpotionmaker(AaronFunctions):
         
         
     def open_bank(self):
-        # self.click_color(clr.CYAN) # Click banker
-        self.open_bank_af(tag_color=clr.CYAN, bank_type="booth")
+        self.open_bank_af(tag_color=clr.CYAN, bank_type="booth") # Click banker
         primary_bank = self.get_primary_bank_img() 
         secondary_bank = self.get_secondary_bank_img() 
         primary = self.wait_until_img(primary_bank, self.win.game_view)
