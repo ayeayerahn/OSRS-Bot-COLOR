@@ -76,10 +76,14 @@ class OSRSpotionmaker(AaronFunctions):
         primary_img = self.get_primary_bank_img() 
         secondary_img = self.get_secondary_bank_img() 
         if primary := self.wait_until_img(primary_img, self.win.control_panel):
+            self.log_msg("Primary found in inventory")
             if secondary := self.wait_until_img(secondary_img, self.win.control_panel):
+                self.log_msg("Secondary found in inventory")
                 self.mouse.move_to(primary.random_point())
+                self.log_msg("Moving to primary")
                 self.mouse.click()
                 self.mouse.move_to(secondary.random_point())
+                self.log_msg("Moving to secondary")
                 self.mouse.click()
             else:
                 self.log_msg("Couldn't find secondary in inventory..")
@@ -89,9 +93,9 @@ class OSRSpotionmaker(AaronFunctions):
             return self.main_loop()
         time.sleep(1)
         pag.press('space')
-        time.sleep(2) # Guarantees that if the last message  was amulet breaking, we don't start everything
+        time.sleep(5) # Guarantees that if the last message  was amulet breaking, we don't start everything
         counter = 0
-        while counter <= 13: # Usually 17 seconds but minus 1 for the above sleep(1)
+        while counter <= 10: # Usually 17 seconds but minus 1 for the above sleep(1)
             if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
                 self.log_msg("Amulet broken. Banking.")
                 break
@@ -102,10 +106,12 @@ class OSRSpotionmaker(AaronFunctions):
         amulet_of_chemistry_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "amulet_of_chemistry_bank.png")
         amulet_of_chemistry_bank = self.wait_until_img(amulet_of_chemistry_bank_img, self.win.game_view)
         if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
+            self.log_msg("Broken amulet text found in chat")
             self.mouse.move_to(amulet_of_chemistry_bank.random_point())
             self.mouse.right_click()
             if withdraw_text := ocr.find_text("1 Amulet", self.win.game_view, ocr.BOLD_12, [clr.WHITE, clr.ORANGE]):
                 self.mouse.move_to(withdraw_text[1].random_point(), knotsCount=0)
+                self.log_msg("Withdrawing new amulet")
                 self.mouse.click()
                 time.sleep(1)
         amulet_of_chemistry_inv_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "amulet_of_chemistry.png")
@@ -114,6 +120,7 @@ class OSRSpotionmaker(AaronFunctions):
             pag.keyDown('shift')
             self.mouse.click()
             pag.keyUp('shift')
+            self.log_msg("Amulet equipped successfully")
             time.sleep(1)
         
         
@@ -122,17 +129,23 @@ class OSRSpotionmaker(AaronFunctions):
         primary_bank = self.get_primary_bank_img() 
         secondary_bank = self.get_secondary_bank_img() 
         primary = self.wait_until_img(primary_bank, self.win.game_view)
+        self.log_msg("Found primary in bank view")
         secondary = self.wait_until_img(secondary_bank, self.win.game_view)
+        self.log_msg("Found secondary in bank view")
         self.deposit_all()
+        self.log_msg("Deposit button successfully clicked.")
         self.check_broken_amulet_text()
         self.mouse.move_to(primary.random_point())
+        self.log_msg("Withdrawing primary ingrediants")
         if self.mouseover_text(contains="Release"):
             self.log_msg("Ran out of primary. Stopping script.")
             self.stop()
         self.mouse.click()
         self.mouse.move_to(secondary.random_point())
+        self.log_msg("Withdrawing secondary ingrediants")
         if self.mouseover_text(contains="Release"):
             self.log_msg("Ran out of secondary. Stopping script.")
             self.stop()
-        self.mouse.click()      
+        self.mouse.click()     
+        self.log_msg("Exiting bank.") 
         pag.press("escape")
