@@ -18,3 +18,4 @@ from .AaronScripts.ectofuntus import OSRSectofuntus
 from .AaronScripts.gilded_altar import OSRSgildedaltar
 from .AaronScripts.wines import OSRSwines
 from .AaronScripts.potion_maker import OSRSpotionmaker
+from .AaronScripts.aaron_functions import AaronFunctions
