@@ -125,7 +125,8 @@ class OSRSpotionmaker(AaronFunctions):
         
         
     def open_bank(self):
-        self.click_color(clr.CYAN) # Click banker
+        # self.click_color(clr.CYAN) # Click banker
+        self.open_bank_af()
         primary_bank = self.get_primary_bank_img() 
         secondary_bank = self.get_secondary_bank_img() 
         primary = self.wait_until_img(primary_bank, self.win.game_view)

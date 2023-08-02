@@ -5,12 +5,13 @@ import utilities.imagesearch as imsearch
 import pyautogui as pag
 import utilities.ocr as ocr
 from model.osrs.osrs_bot import OSRSBot
+from model.osrs.AaronScripts.aaron_functions import AaronFunctions
 from utilities.imagesearch import search_img_in_rect
 from utilities.geometry import Rectangle, Point
 from pathlib import Path
 
 
-class OSRSwines(OSRSBot):
+class OSRSwines(AaronFunctions):
     def __init__(self):
         bot_title = "Wines"
         description = "<Bot description here.>"
@@ -72,7 +73,8 @@ class OSRSwines(OSRSBot):
         time.sleep(18)
         
     def open_bank(self):
-        self.click_color(clr.CYAN)
+        # self.click_color(clr.CYAN)
+        self.open_bank_af()
         grapes_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "grapes_bank.png")
         jug_of_water_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "jug_of_water_bank.png")
         grapes = self.wait_until_img(grapes_bank_img, self.win.game_view)
