@@ -78,8 +78,13 @@ class OSRSblastfurnace(AaronFunctions):
         else:
             self.log_msg("Couldn't find ore in inventory..Stopping script")
             self.stop()
+        timer = 0
         while not self.chatbox_text_BLACK_first_line(contains="conveyor"):
             time.sleep(0.5)
+            timer += 1
+            if timer == 20:
+                self.log_msg("10 seconds have past and we've not seen the confirmed chat text. Clicking conveyor belt again.")
+                return self.make_gold_ore()
         self.log_msg("Successfully deposited the gold ore.")
         first_tile = self.get_nearest_tag(clr.PINK)
         self.mouse.move_to(first_tile.random_point())
