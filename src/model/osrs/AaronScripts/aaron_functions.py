@@ -43,6 +43,30 @@ class AaronFunctions(OSRSBot):
                 self.log_msg("failed to find object to click. Stopping script.")
                 self.stop() 
         return
+    
+    def is_bank_open(self):
+        """Checks if the bank is open, if not, opens it
+        Returns:
+            True if the bank is open, False if not
+        Args:
+            None"""
+        # Define the image to search for in the bank interface
+        deposit_all_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png")
+
+        # Set a time limit for searching for the image
+        end_time = time.time() + 2
+
+        # Loop until the time limit is reached
+        while (time.time() < end_time):
+            # Check if the image is found in the game view
+            if deposit_btn := imsearch.search_img_in_rect(deposit_all_img, self.win.game_view):
+                return True
+
+            # Sleep for a short time to avoid excessive CPU usage
+            time.sleep(.2)
+
+        # If the image was not found within the time limit, return False
+        return False
 
     def deposit_all(self): 
         deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
@@ -51,44 +75,33 @@ class AaronFunctions(OSRSBot):
             self.mouse.click() 
             return
         
-    def open_bank_af(self, tag_color: clr, bank_type: str):
-        retry_counter = 0
-        bank_found  = None
-        bank_text = None
-        mouse_text = None    
+    def open_bank_af(self):
+        """
+        This will bank all logs in the inventory.
+        Returns: 
+            void
+        Args: 
+            deposit_slots (int) - Inventory position of each different item to deposit.
+        """
+        # move mouse to bank and click while not red click
+        bank = self.get_nearest_tag(clr.CYAN)
+        self.mouse.move_to(bank.random_point())
+        while not self.mouse.click(check_red_click=True):
+            bank = self.get_nearest_tag(clr.CYAN)
+            self.mouse.move_to(bank.random_point())
 
-        if bank_type == "booth":
-            bank_text = "Bank Bank booth"
-            mouse_text ="Bank"
-        elif bank_type == "box":
-            bank_text = "Deposit Bank Desposit Box"
-            mouse_text = "Deposit"
-        elif bank_type == "chest":
-            bank_text = "Use Bank chest"
-            mouse_text = "Use"
-        if bank_text == None or mouse_text == None:
-            self.log_msg("Argument error please use one of the following strings for the argument bank_type: 'booth', 'box', 'chest' ")
-            self.stop()
-        while retry_counter < 5 and not bank_found:
-            bank_booth = self.get_nearest_tag(tag_color)
-            if bank_booth:
-                self.mouse.move_to(bank_booth.random_point())
-                if not self.mouseover_text(contains=mouse_text, color = clr.OFF_WHITE):
-                    self.mouse.right_click()
-                    if option_text:= ocr.find_text(bank_text, self.win.game_view, ocr.BOLD_12, [clr.WHITE, clr.CYAN]):
-                        self.mouse.move_to(option_text[0].random_point(), mouseSpeed="medium")
-                        self.mouse.click()
-                else:
-                    self.mouse.click()
-            timer = time.time() + 10
-            while time.time() < timer and not bank_found:
-                deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
-                bank_found = self.wait_until_img(deposit_img, self.win.game_view)
-                time.sleep(.5)
-            retry_counter += 1
-        if not bank_found:
-            self.log_msg("Bank was not in game view or couldn't reach after clicking.")
-            self.stop()
+        wait_time = time.time()
+        while not self.is_bank_open():
+            if time.time() - wait_time > 20:
+                self.mouse.move_to(bank.random_point())
+                while not self.mouse.click(check_red_click=True):
+                    bank = self.get_nearest_tag(clr.CYAN)
+                    self.mouse.move_to(bank.random_point())
+            # if we waited for 17 seconds, break out of loop
+            if time.time() - wait_time > 30:
+                self.log_msg("We clicked on the bank but bank is not open after 12 seconds, bot is quiting...")
+                self.stop()
+        return
 
             
     def sleep(self, num1, num2):

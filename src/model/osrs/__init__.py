@@ -1,3 +1,4 @@
+from .AaronScripts.aaron_functions import AaronFunctions
 #from .combat.combat import OSRSCombat
 #from .woodcutter import OSRSWoodcutter
 #from .AaronScripts.agility import OSRSagility
@@ -18,4 +19,4 @@ from .AaronScripts.ectofuntus import OSRSectofuntus
 from .AaronScripts.gilded_altar import OSRSgildedaltar
 from .AaronScripts.wines import OSRSwines
 from .AaronScripts.potion_maker import OSRSpotionmaker
-from .AaronScripts.aaron_functions import AaronFunctions
+from .AaronScripts.blastfurnace import OSRSblastfurnace

@@ -73,7 +73,7 @@ class OSRSwines(AaronFunctions):
         time.sleep(16.8)
         
     def open_bank(self):
-        self.open_bank_af(tag_color=clr.CYAN, bank_type="booth")
+        self.open_bank_af()
         grapes_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "grapes_bank.png")
         jug_of_water_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "jug_of_water_bank.png")
         grapes = self.wait_until_img(grapes_bank_img, self.win.game_view)
