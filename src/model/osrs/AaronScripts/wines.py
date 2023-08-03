@@ -57,9 +57,9 @@ class OSRSwines(AaronFunctions):
         grapes_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "grapes.png")
         jug_of_water_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "jug_of_water.png")
         if grapes := self.wait_until_img(grapes_img, self.win.control_panel):
+            self.mouse.move_to(grapes.random_point())
+            self.mouse.click()
             if jug_of_water := self.wait_until_img(jug_of_water_img, self.win.control_panel):
-                self.mouse.move_to(grapes.random_point())
-                self.mouse.click()
                 self.mouse.move_to(jug_of_water.random_point())
                 self.mouse.click()
             else:
