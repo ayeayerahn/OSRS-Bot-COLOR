@@ -131,3 +131,35 @@ class AaronFunctions(OSRSBot):
                 break
             time.sleep(0.1)
         return
+    
+
+#This function specifically searches the 28th slot of the inventory. It returns False if the slot is empty and True if it contains any item.
+    def search_slot_28(self):
+        #define inventory_slots
+        self.__locate_inv_slots(self.win.control_panel)
+        # Create a rectangle for the 28th inventory slot
+        slot_28 = self.inventory_slots[27]
+
+        # Search for each item in the 28th inventory slot
+        item_path = imsearch.BOT_IMAGES.joinpath("Aarons_images", "emptyslot.PNG")
+        if search_img_in_rect(item_path, slot_28):
+            self.log_msg(f"Slot 28: Empty")
+            return False
+        self.log_msg(f"Slot 28: Full")
+        return True
+    
+#Make sure that this function is either imported from another file or defined in the same file before calling it.
+    def __locate_inv_slots(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each inventory slot relative to the control panel, storing it in the class property.
+        """
+        self.inventory_slots = []
+        slot_w, slot_h = 36, 32  # dimensions of a slot
+        gap_x, gap_y = 6, 4  # pixel gap between slots
+        y = 44 + cp.top  # start y relative to cp template
+        for _ in range(7):
+            x = 40 + cp.left  # start x relative to cp template
+            for _ in range(4):
+                self.inventory_slots.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+                x += slot_w + gap_x
+            y += slot_h + gap_y

@@ -76,17 +76,31 @@ class OSRSwines(AaronFunctions):
         self.open_bank_af()
         grapes_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "grapes_bank.png")
         jug_of_water_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "jug_of_water_bank.png")
-        grapes = self.wait_until_img(grapes_bank_img, self.win.game_view)
-        jug_of_water = self.wait_until_img(jug_of_water_bank_img, self.win.game_view)
         self.deposit_all()
-        self.mouse.move_to(grapes.random_point())
-        if self.mouseover_text(contains="Release"):
+        if grapes := imsearch.search_img_in_rect(grapes_bank_img, self.win.game_view):
+            self.mouse.move_to(grapes.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of grapes. Stopping script.")
+                self.stop()
+            self.mouse.click()
+        else:
+            self.log_msg("Ran out of grapes. Stopping script.")
+            self.stop()            
+
+
+        if jug_of_water := imsearch.search_img_in_rect(jug_of_water_bank_img, self.win.game_view):
+            self.mouse.move_to(jug_of_water.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of jug of water. Stopping script.")
+                self.stop()
+            self.mouse.click() 
+        else:
             self.log_msg("Ran out of grapes. Stopping script.")
             self.stop()
-        self.mouse.click()
-        self.mouse.move_to(jug_of_water.random_point())
-        if self.mouseover_text(contains="Release"):
-            self.log_msg("Ran out of jug of water. Stopping script.")
+
+        if self.search_slot_28():
+            self.log_msg("Inventory full. Closing bank.")
+            pag.press("escape")
+        else:
+            self.log_msg("Inventory was not full so the bank did not close. Stopping the script.")
             self.stop()
-        self.mouse.click()      
-        pag.press("escape")
