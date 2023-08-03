@@ -87,7 +87,6 @@ class OSRSwines(AaronFunctions):
             self.log_msg("Ran out of grapes. Stopping script.")
             self.stop()            
 
-
         if jug_of_water := imsearch.search_img_in_rect(jug_of_water_bank_img, self.win.game_view):
             self.mouse.move_to(jug_of_water.random_point())
             if self.mouseover_text(contains="Release"):
@@ -97,7 +96,9 @@ class OSRSwines(AaronFunctions):
         else:
             self.log_msg("Ran out of grapes. Stopping script.")
             self.stop()
-
+        
+        # Update this to wait until the slot is full
+        time.sleep(1)
         if self.search_slot_28():
             self.log_msg("Inventory full. Closing bank.")
             pag.press("escape")
