@@ -18,7 +18,7 @@ class OSRSpotionmaker(AaronFunctions):
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
         self.running_time = 1
-        self.potion_list = ['Prayer', 'Super Restore', 'Stamina']
+        self.potion_list = ['Super Combats', 'Prayer', 'Super Restore', 'Stamina']
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -45,11 +45,11 @@ class OSRSpotionmaker(AaronFunctions):
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:             
-            # Open bank, withdraw supplies and close the bank
+            # self.open_bank_super_cmbs()
+            # self.make_potions_super_cmbs()
+            
             self.open_bank()
-                       
-            # Make potions
-            self.make_potions()
+            self.make_potions()           
             
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -81,20 +81,17 @@ class OSRSpotionmaker(AaronFunctions):
         secondary_img = self.get_secondary_bank_img() 
         if primary := self.wait_until_img(primary_img, self.win.control_panel):
             self.log_msg("Primary found in inventory")
-            if secondary := self.wait_until_img(secondary_img, self.win.control_panel):
-                self.log_msg("Secondary found in inventory")
-                self.mouse.move_to(primary.random_point())
-                self.log_msg("Moving to primary")
-                self.mouse.click()
-                self.mouse.move_to(secondary.random_point())
-                self.log_msg("Moving to secondary")
-                self.mouse.click()
-            else:
-                self.log_msg("Couldn't find secondary in inventory..")
-                return self.main_loop()
+            self.mouse.move_to(primary.random_point())
+            self.mouse.click()
         else:
-            self.log_msg("Couldn't find primary in inventory..")
-            return self.main_loop()
+            self.log_msg("Primary was not found in inventory. Stopping script.")
+            
+        if secondary := self.wait_until_img(secondary_img, self.win.control_panel):
+            self.log_msg("Secondary found in inventory")
+            self.mouse.move_to(secondary.random_point())
+            self.mouse.click()
+        else:
+            self.log_msg("Secondary was not found in inventory. Stopping script.")
         time.sleep(1)
         pag.press('space')
         time.sleep(5) # Guarantees that if the last message  was amulet breaking, we don't start everything
@@ -106,9 +103,29 @@ class OSRSpotionmaker(AaronFunctions):
             counter += 1
             time.sleep(1)
             
+    def make_potions_super_cmbs(self):
+        torst_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "torstol_bank.png")
+        super_str_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_strength(4)_bank.png")
+        if torst_bank := self.wait_until_img(torst_bank_img, self.win.control_panel):
+            self.log_msg("Torstol found in inventory")
+            self.mouse.move_to(torst_bank.random_point())
+            self.mouse.click()
+        else:
+            self.log_msg("Torstol was not found in inventory. Stopping script.")
+            
+        if super_str := self.wait_until_img(super_str_bank_img, self.win.control_panel):
+            self.log_msg("Secondary found in inventory")
+            self.mouse.move_to(super_str.random_point())
+            self.mouse.click()
+        else:
+            self.log_msg("Super strength was not found in inventory. Stopping script.")
+        time.sleep(1)
+        pag.press('space')
+        time.sleep(8.5)
+            
     def check_broken_amulet_text(self):
         amulet_of_chemistry_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "amulet_of_chemistry_bank.png")
-        amulet_of_chemistry_bank = self.wait_until_img(amulet_of_chemistry_bank_img, self.win.game_view)
+        amulet_of_chemistry_bank = imsearch.search_img_in_rect(amulet_of_chemistry_bank_img, self.win.game_view)
         if self.chatbox_text_RED_dodgy_necklace(contains="crumbles"):
             self.log_msg("Broken amulet text found in chat")
             self.mouse.move_to(amulet_of_chemistry_bank.random_point())
@@ -126,30 +143,113 @@ class OSRSpotionmaker(AaronFunctions):
             pag.keyUp('shift')
             self.log_msg("Amulet equipped successfully")
             time.sleep(1)
+        return
         
         
     def open_bank(self):
         self.open_bank_af() # Click banker
         primary_bank = self.get_primary_bank_img() 
         secondary_bank = self.get_secondary_bank_img() 
-        primary = self.wait_until_img(primary_bank, self.win.game_view)
-        self.log_msg("Found primary in bank view")
-        secondary = self.wait_until_img(secondary_bank, self.win.game_view)
-        self.log_msg("Found secondary in bank view")
         self.deposit_all()
-        self.log_msg("Deposit button successfully clicked.")
         self.check_broken_amulet_text()
-        self.mouse.move_to(primary.random_point())
-        self.log_msg("Withdrawing primary ingrediants")
-        if self.mouseover_text(contains="Release"):
-            self.log_msg("Ran out of primary. Stopping script.")
-            self.stop()
-        self.mouse.click()
-        self.mouse.move_to(secondary.random_point())
-        self.log_msg("Withdrawing secondary ingrediants")
-        if self.mouseover_text(contains="Release"):
+        if primary := imsearch.search_img_in_rect(primary_bank, self.win.game_view):
+            if secondary := imsearch.search_img_in_rect(secondary_bank, self.win.game_view):
+                self.log_msg("Found primary in bank view")
+                self.mouse.move_to(primary.random_point())
+                if self.mouseover_text(contains="Release"):
+                    self.log_msg("Ran out of primary. Stopping script.")
+                    self.stop()
+                self.mouse.click()
+                self.log_msg("Found secondary in bank view")
+                self.mouse.move_to(secondary.random_point())
+                if self.mouseover_text(contains="Release"):
+                    self.log_msg("Ran out of secondary. Stopping script.")
+                    self.stop()
+                self.mouse.click()
+            else:
+                self.log_msg("Ran out of primary. Stopping script.")
+                self.stop()           
+        else:
             self.log_msg("Ran out of secondary. Stopping script.")
+            self.stop()    
+        # if primary := imsearch.search_img_in_rect(primary_bank, self.win.game_view):
+        #     self.log_msg("Found primary in bank view")
+        #     self.mouse.move_to(primary.random_point())
+        #     if self.mouseover_text(contains="Release"):
+        #         self.log_msg("Ran out of primary. Stopping script.")
+        #         self.stop()
+        #     self.mouse.click()
+        # else:
+        #     self.log_msg("Ran out of primary. Stopping script.")
+        #     self.stop()
+            
+        # if secondary := imsearch.search_img_in_rect(secondary_bank, self.win.game_view):
+        #     self.log_msg("Found secondary in bank view")
+        #     self.mouse.move_to(secondary.random_point())
+        #     if self.mouseover_text(contains="Release"):
+        #         self.log_msg("Ran out of secondary. Stopping script.")
+        #         self.stop()
+        #     self.mouse.click()
+        # else:
+        #     self.log_msg("Ran out of secondary. Stopping script.")
+        #     self.stop()    
+        while not self.search_slot_28():
+            time.sleep(0.5)
+        self.log_msg("Exiting bank.") 
+        pag.press("escape")
+        
+    def open_bank_super_cmbs(self):
+        self.open_bank_af() # Click banker
+        torst_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "torstol_bank.png")
+        super_str_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_strength(4)_bank.png")
+        super_atk_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_attack(4)_bank.png")
+        super_def_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_defence(4)_bank.png")
+        self.deposit_all()
+        if torst_bank := imsearch.search_img_in_rect(torst_bank_img, self.win.game_view):
+            self.log_msg("Deposit button successfully clicked.")
+            self.mouse.move_to(torst_bank.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of torstols. Stopping script.")
+                self.stop()
+            self.mouse.click()
+        else:
+            self.log_msg("Ran out of torstols. Stopping script.")
             self.stop()
-        self.mouse.click()     
+            
+        if super_str_bank := imsearch.search_img_in_rect(super_str_bank_img, self.win.game_view):
+            self.log_msg("Deposit button successfully clicked.")
+            self.mouse.move_to(super_str_bank.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of torstols. Stopping script.")
+                self.stop()
+            self.mouse.click()
+        else:
+            self.log_msg("Ran out of super strengths. Stopping script.")
+            self.stop()
+            
+        if super_atk_bank := imsearch.search_img_in_rect(super_atk_bank_img, self.win.game_view):
+            self.log_msg("Deposit button successfully clicked.")
+            self.mouse.move_to(super_atk_bank.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of torstols. Stopping script.")
+                self.stop()
+            self.mouse.click()
+        else:
+            self.log_msg("Ran out of super attacks. Stopping script.")
+            self.stop()
+            
+        if super_def_bank := imsearch.search_img_in_rect(super_def_bank_img, self.win.game_view):
+            self.log_msg("Deposit button successfully clicked.")
+            self.mouse.move_to(super_def_bank.random_point())
+            if self.mouseover_text(contains="Release"):
+                self.log_msg("Ran out of torstols. Stopping script.")
+                self.stop()
+            self.mouse.click()
+        else:
+            self.log_msg("Ran out of super defences. Stopping script.")
+            self.stop()
+  
+        while not self.search_slot_28():
+            time.sleep(0.5)
         self.log_msg("Exiting bank.") 
         pag.press("escape")

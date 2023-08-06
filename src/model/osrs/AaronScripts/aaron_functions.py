@@ -70,7 +70,7 @@ class AaronFunctions(OSRSBot):
 
     def deposit_all(self): 
         deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
-        if deposit := self.wait_until_img(deposit_img, self.win.game_view):
+        if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
             self.mouse.move_to(deposit.random_point())   
             self.mouse.click() 
             return

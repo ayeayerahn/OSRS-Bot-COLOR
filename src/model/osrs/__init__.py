@@ -15,8 +15,8 @@ from.AaronScripts.truebloods import OSRStruebloods
 #from .AaronScripts.wintertodt import OSRSwintertodt
 #from .AaronScripts.ardyknights import OSRSardyknights
 from .AaronScripts.mlm import OSRSmlm
-from .AaronScripts.ectofuntus import OSRSectofuntus
+# from .AaronScripts.ectofuntus import OSRSectofuntus
 from .AaronScripts.gilded_altar import OSRSgildedaltar
-from .AaronScripts.wines import OSRSwines
+# from .AaronScripts.wines import OSRSwines
 from .AaronScripts.potion_maker import OSRSpotionmaker
 from .AaronScripts.blastfurnace import OSRSblastfurnace
