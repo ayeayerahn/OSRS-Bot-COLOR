@@ -20,3 +20,4 @@ from .AaronScripts.gilded_altar import OSRSgildedaltar
 # from .AaronScripts.wines import OSRSwines
 from .AaronScripts.potion_maker import OSRSpotionmaker
 from .AaronScripts.blastfurnace import OSRSblastfurnace
+from .AaronScripts.chinchompas import OSRSHunter

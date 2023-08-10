@@ -45,11 +45,11 @@ class OSRSpotionmaker(AaronFunctions):
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:             
-            # self.open_bank_super_cmbs()
-            # self.make_potions_super_cmbs()
+            self.open_bank_super_cmbs()
+            self.make_potions_super_cmbs()
             
-            self.open_bank()
-            self.make_potions()           
+            # self.open_bank()
+            # self.make_potions()           
             
             self.update_progress((time.time() - start_time) / end_time)
 
