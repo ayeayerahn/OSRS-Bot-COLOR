@@ -59,7 +59,7 @@ class OSRSHunter(AaronFunctions):
             if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
                 last_exp = self.get_total_xp()
                 counter = 0
-                self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fast")
+                self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
                 self.log_msg("Caught the chin $$$")
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
@@ -67,7 +67,7 @@ class OSRSHunter(AaronFunctions):
                         new_xp = self.get_total_xp()
                         if new_xp != last_exp:
                             break
-                    time.sleep(3.3)
+                    time.sleep(3.52)
         # if not yellow_traps:                   
         #     if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
         #         self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
