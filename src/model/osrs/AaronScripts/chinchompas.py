@@ -63,7 +63,7 @@ class OSRSHunter(AaronFunctions):
                 self.log_msg("Caught the chin $$$")
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
-                    while counter < 1000:
+                    while counter < 100:
                         new_xp = self.get_total_xp()
                         if new_xp != last_exp:
                             break
@@ -85,7 +85,7 @@ class OSRSHunter(AaronFunctions):
                 self.mouse.move_to(failed_trap[0].center(), mouseSpeed='fastest')
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
-                    while timer < 1000:
+                    while timer < 100:
                         if self.chatbox_text_BLACK_first_line(contains="dismantle"):
                             break
                         timer += 1
