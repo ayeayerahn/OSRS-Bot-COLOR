@@ -63,11 +63,13 @@ class OSRSHunter(AaronFunctions):
                 self.log_msg("Caught the chin $$$")
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
-                    while counter < 17:
+                    while counter < 1000:
                         new_xp = self.get_total_xp()
                         if new_xp != last_exp:
                             break
-                    time.sleep(3.52)
+                        counter += 1
+                        time.sleep(0.1)
+                    time.sleep(3.51)
         # if not yellow_traps:                   
         #     if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
         #         self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
@@ -78,11 +80,17 @@ class OSRSHunter(AaronFunctions):
         
         if not self.get_nearest_tag(clr.PINK):
             if failed_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.RED):
+                timer = 0
                 self.log_msg("Slippery chinchompa got away :(")
                 self.mouse.move_to(failed_trap[0].center(), mouseSpeed='fastest')
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
-                    time.sleep(8.4)      
+                    while timer < 1000:
+                        if self.chatbox_text_BLACK_first_line(contains="dismantle"):
+                            break
+                        timer += 1
+                        time.sleep(0.1)
+                    time.sleep(3.51)      
         
         if reset_trap := self.get_nearest_tag(clr.OFF_YELLOW):
             self.log_msg("Resetting trap, must of had a funny smell..")
