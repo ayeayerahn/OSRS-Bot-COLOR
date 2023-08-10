@@ -90,11 +90,11 @@ class OSRSHunter(AaronFunctions):
                             break
                         timer += 1
                         time.sleep(0.1)
-                    time.sleep(3.51)      
+                    time.sleep(3.52)      
         
         if reset_trap := self.get_nearest_tag(clr.OFF_YELLOW):
             self.log_msg("Resetting trap, must of had a funny smell..")
             self.mouse.move_to(reset_trap.random_point(), mouseSpeed='fastest')
             if self.mouseover_text(contains= "Lay", color=clr.OFF_WHITE):
                 self.mouse.click()
-                time.sleep(6)
+                time.sleep(5.5)
