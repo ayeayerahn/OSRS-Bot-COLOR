@@ -55,26 +55,26 @@ class OSRSHunter(AaronFunctions):
     def hunt(self):
         yellow_traps = self.get_all_tagged_in_rect(self.win.game_view, clr.YELLOW)
         
-        # if not yellow_traps:                   
-        #     if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
-        #         last_exp = self.get_total_xp()
-        #         counter = 0
-        #         self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fast")
-        #         self.log_msg("Caught the chin $$$")
-        #         if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
-        #             self.mouse.click()
-        #             while counter < 17:
-        #                 new_xp = self.get_total_xp()
-        #                 if new_xp != last_exp:
-        #                     break
-        #             time.sleep(3.0)
         if not yellow_traps:                   
             if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
-                self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
+                last_exp = self.get_total_xp()
+                counter = 0
+                self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fast")
                 self.log_msg("Caught the chin $$$")
                 if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
                     self.mouse.click()
-                    time.sleep(8.4)
+                    while counter < 17:
+                        new_xp = self.get_total_xp()
+                        if new_xp != last_exp:
+                            break
+                    time.sleep(3.3)
+        # if not yellow_traps:                   
+        #     if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
+        #         self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
+        #         self.log_msg("Caught the chin $$$")
+        #         if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
+        #             self.mouse.click()
+        #             time.sleep(8.4)
         
         if not self.get_nearest_tag(clr.PINK):
             if failed_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.RED):
