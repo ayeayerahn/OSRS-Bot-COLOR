@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 
 import utilities.api.item_ids as item_ids
+import utilities.imagesearch as imsearch
 import utilities.color as clr
 import utilities.game_launcher as launcher
 from model.osrs.AaronScripts.aaron_functions import AaronFunctions
@@ -147,6 +148,32 @@ class OSRSCombat(AaronFunctions):
         self.update_progress(1)
         self.__logout("Finished.")
 
+    def prayer_pot(self):
+        super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
+        super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
+        super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
+        super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
+        current_prayer = self.get_prayer()
+        if current_prayer <= 40:
+            self.log_msg("Prayer is low.")
+            if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel):
+                self.log_msg("Found super restore (1)")
+                self.mouse.move_to(super_rest_1.random_point())
+                self.mouse.click()
+            elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel):
+                self.log_msg("Found super restore (2)")
+                self.mouse.move_to(super_rest_2.random_point())
+                self.mouse.click()
+            elif super_rest_3 := imsearch.search_img_in_rect(super_rest_3_img, self.win.control_panel):
+                self.log_msg("Found super restore (3)")
+                self.mouse.move_to(super_rest_3.random_point())
+                self.mouse.click()
+            elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel):
+                self.log_msg("Found super restore (4)")
+                self.mouse.move_to(super_rest_4.random_point())
+                self.mouse.click()
+
+
     def __eat(self, api: StatusSocket):
         self.log_msg("HP is low.")
         food_slots = api.get_inv_item_indices(item_ids.all_food)
@@ -161,7 +188,7 @@ class OSRSCombat(AaronFunctions):
     def __loot(self, api: StatusSocket):
         """Picks up loot while there is loot on the ground"""
         while self.pick_up_loot(self.loot_items):
-            if api.get_is_inv_full():
+            if self.search_slot_28():
                 self.__logout("Inventory full. Cannot loot.")
                 return
             curr_inv = len(api.get_inv())
