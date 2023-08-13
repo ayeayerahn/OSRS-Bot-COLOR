@@ -144,7 +144,7 @@ class OSRSCombat(AaronFunctions):
 
             # Loot all highlighted items on the ground
             if self.loot_items:
-                self.__loot(api_status)
+                self.__loot(api_morg)
             # if self.pick_up_loot(items= self.lootables()):
             #     curr_inv = len(api_status.get_inv())
             #     self.log_msg("Picking up loot...")
@@ -161,10 +161,10 @@ class OSRSCombat(AaronFunctions):
         self.__logout("Finished.")
 
     def prayer_pot(self):
-        super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
-        super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
-        super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
         super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
+        super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
+        super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
+        super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
         # current_prayer = self.get_prayer()
         # if current_prayer <= 40:
         self.log_msg("Prayer is low.")
@@ -199,7 +199,7 @@ class OSRSCombat(AaronFunctions):
         self.mouse.move_to(self.win.inventory_slots[food_slots[0]].random_point())
         self.mouse.click()
 
-    def __loot(self, api: StatusSocket):
+    def __loot(self, api: MorgHTTPSocket):
         """Picks up loot while there is loot on the ground"""
         while self.pick_up_loot(self.loot_items):
             if self.search_slot_28():
@@ -226,5 +226,17 @@ class OSRSCombat(AaronFunctions):
             self.stop()
 
     def lootables(self) -> list:
-        ITEMS = ["Rune med helm", "Rune bar", "Blood rune", "Rune Battleaxe"]
+        ITEMS = [
+            "Rune med helm",
+            "Rune bar",
+            "Blood rune",
+            "Rune Battleaxe",
+            "Runite bar",
+            "Rune 2h sword",
+            "Rune sq shield",
+            "Rune kiteshield",
+            "Dragon med helm",
+            "Shield left half",
+            "Dragon spear"
+            ]
         return ITEMS
