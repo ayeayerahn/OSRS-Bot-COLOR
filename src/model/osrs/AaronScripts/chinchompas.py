@@ -70,13 +70,6 @@ class OSRSHunter(AaronFunctions):
                         counter += 1
                         time.sleep(0.1)
                     time.sleep(3.51)
-        # if not yellow_traps:                   
-        #     if caught_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.PINK):
-        #         self.mouse.move_to(caught_trap[0].center(), mouseSpeed="fastest")
-        #         self.log_msg("Caught the chin $$$")
-        #         if self.mouseover_text(contains= "Reset", color=clr.OFF_WHITE):
-        #             self.mouse.click()
-        #             time.sleep(8.4)
         
         if not self.get_nearest_tag(clr.PINK):
             if failed_trap := self.get_all_tagged_in_rect(self.win.game_view, clr.RED):
