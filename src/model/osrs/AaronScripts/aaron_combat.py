@@ -19,20 +19,20 @@ class OSRSCombat(AaronFunctions):
         description = "This bot kills NPCs. Position your character near some NPCs and highlight them.\nTHIS SCRIPT IS AN EXAMPLE, DO NOT USE LONGTERM."
         super().__init__(bot_title=bot_title, description=description)
         self.running_time: int = 1
-        self.loot_items: str = ""
+        self.loot_items: str = self.lootables()
         self.hp_threshold: int = 0
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
-        self.options_builder.add_text_edit_option("loot_items", "Loot items (requires re-launch):", "E.g., Coins, Dragon bones")
+        # self.options_builder.add_text_edit_option("loot_items", "Loot items (requires re-launch):", "E.g., Coins, Dragon bones")
         self.options_builder.add_slider_option("hp_threshold", "Low HP threshold (0-100)?", 0, 100)
 
     def save_options(self, options: dict):
         for option in options:
             if option == "running_time":
                 self.running_time = options[option]
-            elif option == "loot_items":
-                self.loot_items = options[option]
+            # elif option == "loot_items":
+            #     self.loot_items = options[option]
             elif option == "hp_threshold":
                 self.hp_threshold = options[option]
             else:
@@ -64,7 +64,7 @@ class OSRSCombat(AaronFunctions):
         dst = Path(__file__).parent.joinpath("custom_settings.properties")
         shutil.copy(str(src), str(dst))
 
-        # Modify the highlight list
+        # # Modify the highlight list
         loot_items = self.capitalize_loot_list(self.loot_items, to_list=False)
         with dst.open() as f:
             lines = f.readlines()
@@ -143,9 +143,17 @@ class OSRSCombat(AaronFunctions):
                 time.sleep(1)
 
             # Loot all highlighted items on the ground
-            # if self.loot_items:
-            #     self.__loot(api_status)
-            self.pick_up_loot(items= self.lootables())
+            if self.loot_items:
+                self.__loot(api_status)
+            # if self.pick_up_loot(items= self.lootables()):
+            #     curr_inv = len(api_status.get_inv())
+            #     self.log_msg("Picking up loot...")
+            #     for _ in range(5):  # give the bot 5 seconds to pick up the loot
+            #         if len(api_status.get_inv()) != curr_inv:
+            #             self.log_msg("Loot picked up.")
+            #             time.sleep(1)
+            #             break
+            #         time.sleep(1)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -218,5 +226,5 @@ class OSRSCombat(AaronFunctions):
             self.stop()
 
     def lootables(self) -> list:
-        ITEMS = ["Rune med helm, Rune bar, Blood rune, Rune Battleaxe"]
+        ITEMS = ["Rune med helm", "Rune bar", "Blood rune", "Rune Battleaxe"]
         return ITEMS
