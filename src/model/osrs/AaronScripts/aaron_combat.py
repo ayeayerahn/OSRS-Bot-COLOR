@@ -179,7 +179,7 @@ class OSRSCombat(AaronFunctions):
         self.stop()
 
     def check_task_complete(self):
-        if self.chatbox_text_RED(contains="slayer"):
+        if self.chatbox_text_RED(contains="Slayer"):
             self.log_msg("Task completed. Teleporting to the crafting guild and stopping script.")
             self.craft_cape_teleport()
             self.stop()
