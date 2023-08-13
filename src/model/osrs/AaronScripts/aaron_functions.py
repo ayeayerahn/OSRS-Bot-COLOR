@@ -20,6 +20,7 @@ class AaronFunctions(OSRSBot):
         if spec_energy >= 100:
             self.mouse.move_to(self.win.spec_orb.random_point())
             self.mouse.click()
+            return True
 
     def click_color(self, color: clr):
         """This will click when the nearest tag is not none."""

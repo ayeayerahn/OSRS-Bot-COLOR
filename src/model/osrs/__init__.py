@@ -1,5 +1,5 @@
 from .AaronScripts.aaron_functions import AaronFunctions
-#from .combat.combat import OSRSCombat
+# from .combat.combat import OSRSCombat
 #from .woodcutter import OSRSWoodcutter
 #from .AaronScripts.agility import OSRSagility
 from .AaronScripts.alcher import OSRSalcher
@@ -21,3 +21,5 @@ from .AaronScripts.gilded_altar import OSRSgildedaltar
 from .AaronScripts.potion_maker import OSRSpotionmaker
 from .AaronScripts.blastfurnace import OSRSblastfurnace
 from .AaronScripts.chinchompas import OSRSHunter
+from .AaronScripts.fly_fishing import OSRSfishing
+from .AaronScripts.aaron_combat import OSRSCombat
