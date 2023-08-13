@@ -137,6 +137,9 @@ class OSRSCombat(AaronFunctions):
                 # Check to eat food
                 if self.get_hp() < self.hp_threshold:
                     self.__eat(api_status)
+                current_prayer = self.get_prayer()
+                if current_prayer <= 40:
+                    self.prayer_pot()
                 time.sleep(1)
 
             # Loot all highlighted items on the ground
@@ -153,25 +156,27 @@ class OSRSCombat(AaronFunctions):
         super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
         super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
         super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
-        current_prayer = self.get_prayer()
-        if current_prayer <= 40:
-            self.log_msg("Prayer is low.")
-            if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel):
-                self.log_msg("Found super restore (1)")
-                self.mouse.move_to(super_rest_1.random_point())
-                self.mouse.click()
-            elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel):
-                self.log_msg("Found super restore (2)")
-                self.mouse.move_to(super_rest_2.random_point())
-                self.mouse.click()
-            elif super_rest_3 := imsearch.search_img_in_rect(super_rest_3_img, self.win.control_panel):
-                self.log_msg("Found super restore (3)")
-                self.mouse.move_to(super_rest_3.random_point())
-                self.mouse.click()
-            elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel):
-                self.log_msg("Found super restore (4)")
-                self.mouse.move_to(super_rest_4.random_point())
-                self.mouse.click()
+        # current_prayer = self.get_prayer()
+        # if current_prayer <= 40:
+        self.log_msg("Prayer is low.")
+        if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel):
+            self.log_msg("Found super restore (1)")
+            self.mouse.move_to(super_rest_1.random_point())
+            self.mouse.click()
+        elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel):
+            self.log_msg("Found super restore (2)")
+            self.mouse.move_to(super_rest_2.random_point())
+            self.mouse.click()
+        elif super_rest_3 := imsearch.search_img_in_rect(super_rest_3_img, self.win.control_panel):
+            self.log_msg("Found super restore (3)")
+            self.mouse.move_to(super_rest_3.random_point())
+            self.mouse.click()
+        elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel):
+            self.log_msg("Found super restore (4)")
+            self.mouse.move_to(super_rest_4.random_point())
+            self.mouse.click()
+        time.sleep(3)
+        return
 
 
     def __eat(self, api: StatusSocket):
