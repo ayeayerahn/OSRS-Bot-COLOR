@@ -143,8 +143,9 @@ class OSRSCombat(AaronFunctions):
                 time.sleep(1)
 
             # Loot all highlighted items on the ground
-            if self.loot_items:
-                self.__loot(api_status)
+            # if self.loot_items:
+            #     self.__loot(api_status)
+            self.pick_up_loot(items= self.lootables())
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -215,3 +216,7 @@ class OSRSCombat(AaronFunctions):
             self.log_msg("Task completed. Teleporting to the crafting guild and stopping script.")
             self.craft_cape_teleport()
             self.stop()
+
+    def lootables(self) -> list:
+        ITEMS = ["Rune med helm, Rune bar, Blood rune, Rune Battleaxe"]
+        return ITEMS
