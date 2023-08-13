@@ -109,6 +109,13 @@ class AaronFunctions(OSRSBot):
         sleep_time = rd.fancy_normal_sample(num1, num2)   
         #self.log_msg(f"Sleeping for {sleep_time} seconds")     #Uncomment this out if you wish to see how many seconds the sleep is doing
         time.sleep(sleep_time) 
+
+    def craft_cape_teleport(self):
+        craft_cape_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "crafting_cape(t).png")
+        if craft_cape := imsearch.search_img_in_rect(craft_cape_img, self.win.control_panel):
+            self.mouse.move_to(craft_cape.random_point())
+            self.mouse.click()
+        time.sleep(3)
     
     def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
         """this will wait till img shows up in screen"""

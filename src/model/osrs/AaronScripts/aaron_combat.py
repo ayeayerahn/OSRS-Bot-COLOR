@@ -101,6 +101,7 @@ class OSRSCombat(AaronFunctions):
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
+            self.check_task_complete()
             # If inventory is full...
             if self.search_slot_28():
                 self.log_msg("Inventory is full. Idk what to do.")
@@ -176,3 +177,9 @@ class OSRSCombat(AaronFunctions):
         self.log_msg(msg)
         self.logout()
         self.stop()
+
+    def check_task_complete(self):
+        if self.chatbox_text_RED(contains="slayer"):
+            self.log_msg("Task completed. Teleporting to the crafting guild and stopping script.")
+            self.craft_cape_teleport()
+            self.stop()
