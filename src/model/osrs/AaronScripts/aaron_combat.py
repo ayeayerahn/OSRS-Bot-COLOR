@@ -145,20 +145,15 @@ class OSRSCombat(AaronFunctions):
             # Loot all highlighted items on the ground
             if self.loot_items:
                 self.__loot(api_morg)
-            # if self.pick_up_loot(items= self.lootables()):
-            #     curr_inv = len(api_status.get_inv())
-            #     self.log_msg("Picking up loot...")
-            #     for _ in range(5):  # give the bot 5 seconds to pick up the loot
-            #         if len(api_status.get_inv()) != curr_inv:
-            #             self.log_msg("Loot picked up.")
-            #             time.sleep(1)
-            #             break
-            #         time.sleep(1)
 
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.__logout("Finished.")
+
+    def refill_cannon(self):
+        if self.chatbox_text_RED_first_line(contains="cannon"):
+            
 
     def prayer_pot(self):
         super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
