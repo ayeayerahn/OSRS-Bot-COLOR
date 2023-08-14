@@ -173,7 +173,7 @@ class OSRSCombat(AaronFunctions):
             self.log_msg("Found super restore (3)")
             self.mouse.move_to(super_rest_3.random_point())
             self.mouse.click()
-        elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.03):
+        elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.02):
             self.log_msg("Found super restore (4)")
             self.mouse.move_to(super_rest_4.random_point())
             self.mouse.click()
@@ -238,6 +238,48 @@ class OSRSCombat(AaronFunctions):
             "Torstol seed",
             "Snape grass seed",
             "Snapdragon seed",
+            "Rune chainbody",
+            "Abyssal whip",
+            "Abyssal dagger",
+            "Grimy ranarr weed",
+            "Loop half of key",
+            "Tooth half of key",
+            "Rune 2h sword",
+            "Dragonstone",
+            "Rune spear",
+            "Abyssal head",
+            "Ranarr seed",
+            "Rune longsword",
+            "Dragon javelin heads",
+            "Dragon platelegs",
+            "Dragon plateskirt",
+            "Uncut dragonstone",
+            "Rune hasta",
+            "Rune platelegs",
+            "Rune full helm",
+            "Rune platebody",
+            "Dragon longsword",
+            "Dragon dagger",
+            "Rune javelin",
+            "Soul rune",
+            "Death rune",
+            "Law rune",
+            "Rune arrow",
+            "Dragon dart tip",
+            "Runite ore",
+            "Dragon arrowtips",
+            "Dark bow",
+            "Adamantite bar",
+            "Adamantite ore",
+            "Rune dagger",
+            "Air battlestaff",
+            "Earth battlestaff",
+            "Mystic air staff",
+            "Mystic earth staff",
+            "Dragon chainbody",
+            "Occult necklace",
+            "Smoke rune",
+            "Runite bolts",
             ""
             ]
         return ITEMS
