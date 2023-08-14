@@ -153,7 +153,7 @@ class OSRSCombat(AaronFunctions):
 
     def refill_cannon(self):
         if self.chatbox_text_RED_first_line(contains="cannon"):
-            
+            pass
 
     def prayer_pot(self):
         super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
@@ -234,6 +234,10 @@ class OSRSCombat(AaronFunctions):
             "Ancient shard",
             "Dark totem base",
             "Dark totem middle",
-            "Dark totem top"
+            "Dark totem top",
+            "Torstol seed",
+            "Snape grass seed",
+            "Snapdragon seed",
+            ""
             ]
         return ITEMS
