@@ -165,7 +165,7 @@ class OSRSCombat(AaronFunctions):
             self.log_msg("Found super restore (1)")
             self.mouse.move_to(super_rest_1.random_point())
             self.mouse.click()
-        elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel, confidence=0.04):
+        elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel, confidence=0.03):
             self.log_msg("Found super restore (2)")
             self.mouse.move_to(super_rest_2.random_point())
             self.mouse.click()
@@ -173,7 +173,7 @@ class OSRSCombat(AaronFunctions):
             self.log_msg("Found super restore (3)")
             self.mouse.move_to(super_rest_3.random_point())
             self.mouse.click()
-        elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.04):
+        elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.03):
             self.log_msg("Found super restore (4)")
             self.mouse.move_to(super_rest_4.random_point())
             self.mouse.click()
