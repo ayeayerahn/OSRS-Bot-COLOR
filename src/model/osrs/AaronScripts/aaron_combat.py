@@ -280,6 +280,5 @@ class OSRSCombat(AaronFunctions):
             "Occult necklace",
             "Smoke rune",
             "Runite bolts",
-            ""
             ]
         return ITEMS

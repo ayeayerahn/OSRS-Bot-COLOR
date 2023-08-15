@@ -542,6 +542,21 @@ class Bot(ABC):
             return ocr.extract_text(self.win.chat, ocr.PLAIN_12, clr.TEXT_GREEN)
         if ocr.find_text(contains, self.win.chat, ocr.PLAIN_12, clr.TEXT_GREEN):
             return True
+        
+    def chatbox_text_ANTIFIRE(self, contains: str = None) -> Union[bool, str]:
+        """
+        Examines the chatbox for text. Currently only captures player chat text.
+        Args:
+            contains: The text to search for (single word or phrase). Case sensitive. If left blank,
+                      returns all text in the chatbox.
+        Returns:
+            True if exact string is found, False otherwise.
+            If args are left blank, returns the text in the chatbox.
+        """
+        if contains is None:
+            return ocr.extract_text(self.win.chat, ocr.PLAIN_12, clr.ANTIFIRE)
+        if ocr.find_text(contains, self.win.chat, ocr.PLAIN_12, clr.ANTIFIRE):
+            return True
 
     # --- Client Settings ---
     def set_compass_north(self):
