@@ -220,6 +220,9 @@ class OSRSCombat(AaronFunctions):
             self.log_msg("Task completed. Teleporting to the crafting guild and stopping script.")
             self.craft_cape_teleport()
             self.stop()
+            
+    def check_antifire(self):
+        if self.chatboxtextan
 
     def lootables(self) -> list:
         ITEMS = [
