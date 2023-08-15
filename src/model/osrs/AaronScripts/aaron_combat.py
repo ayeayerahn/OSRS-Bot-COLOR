@@ -140,6 +140,7 @@ class OSRSCombat(AaronFunctions):
                 current_prayer = self.get_prayer()
                 if current_prayer <= 40:
                     self.prayer_pot()
+                self.refill_cannon()
                 time.sleep(1)
 
             # Loot all highlighted items on the ground
@@ -152,8 +153,10 @@ class OSRSCombat(AaronFunctions):
         self.__logout("Finished.")
 
     def refill_cannon(self):
-        if self.chatbox_text_RED_first_line(contains="cannon"):
-            pass
+        if self.chatbox_text_RED_first_line(contains="cannon") or self.chatbox_text_RED_first_line(contains="broken"):
+            self.click_color(clr.GREEN)
+
+        return
 
     def prayer_pot(self):
         super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
@@ -280,6 +283,5 @@ class OSRSCombat(AaronFunctions):
             "Occult necklace",
             "Smoke rune",
             "Runite bolts",
-            ""
             ]
         return ITEMS
