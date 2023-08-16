@@ -159,10 +159,10 @@ class OSRSCombat(AaronFunctions):
         return
 
     def prayer_pot(self):
-        super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
         super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
         super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
         super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
+        super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
         self.log_msg("Prayer is low.")
         if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel, confidence=0.04):
             self.log_msg("Found super restore (1)")
@@ -222,7 +222,28 @@ class OSRSCombat(AaronFunctions):
             self.stop()
             
     def check_antifire(self):
-        if self.chatboxtextan
+        super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
+        super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
+        super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
+        super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
+        if self.chatbox_text_ANTIFIRE(contains="expire"):
+            self.log_msg("Antifire about to expire.")
+            if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel, confidence=0.04):
+                self.log_msg("Found super restore (1)")
+                self.mouse.move_to(super_rest_1.random_point())
+                self.mouse.click()
+            elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel, confidence=0.03):
+                self.log_msg("Found super restore (2)")
+                self.mouse.move_to(super_rest_2.random_point())
+                self.mouse.click()
+            elif super_rest_3 := imsearch.search_img_in_rect(super_rest_3_img, self.win.control_panel, confidence=0.04):
+                self.log_msg("Found super restore (3)")
+                self.mouse.move_to(super_rest_3.random_point())
+                self.mouse.click()
+            elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.02):
+                self.log_msg("Found super restore (4)")
+                self.mouse.move_to(super_rest_4.random_point())
+                self.mouse.click()
 
     def lootables(self) -> list:
         ITEMS = [

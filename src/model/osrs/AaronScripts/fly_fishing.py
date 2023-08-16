@@ -39,14 +39,11 @@ class OSRSfishing(AaronFunctions):
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
-            if self.activate_special():
-                self.click_color(clr.GREEN)
-            else:
-                self.click_color(color=clr.GREEN)
+            if not self.activate_special():
+                self.fish()
             while not self.search_slot_28():
                 if self.activate_special():
-                    # return self.main_loop()
-                    self.click_color(color=clr.GREEN)
+                    self.fish()
                 time.sleep(1)
             self.drop_all(skip_rows=0, skip_slots=[0, 1])
 
@@ -55,3 +52,14 @@ class OSRSfishing(AaronFunctions):
         self.update_progress(1)
         self.log_msg("Finished.")
         self.stop()
+        
+    def fish(self):
+        counter = 0
+        while counter != 10:
+            if fishing_spot := self.get_nearest_tag(color=clr.GREEN):
+                self.mouse.move_to(fishing_spot.random_point())
+                if not self.mouseover_text(contains="Lure", color=clr.OFF_WHITE):
+                    continue
+                self.mouse.click()
+                break
+            counter += 1
