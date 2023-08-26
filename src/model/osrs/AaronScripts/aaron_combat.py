@@ -6,6 +6,7 @@ import utilities.api.item_ids as item_ids
 import utilities.imagesearch as imsearch
 import utilities.color as clr
 import utilities.game_launcher as launcher
+import pyautogui as pag
 from model.osrs.AaronScripts.aaron_functions import AaronFunctions
 from model.bot import BotStatus
 from model.osrs.osrs_bot import OSRSBot
@@ -88,7 +89,6 @@ class OSRSCombat(AaronFunctions):
 
         # Setup API
         api_morg = MorgHTTPSocket()
-        api_status = StatusSocket()
 
         self.toggle_auto_retaliate(True)
 
@@ -126,17 +126,18 @@ class OSRSCombat(AaronFunctions):
                 failed_searches = 0
 
                 # Click target if mouse is actually hovering over it, else recalculate
-                self.mouse.move_to(target.random_point())
+                pag.moveTo(target.random_point())
                 if not self.mouseover_text(contains="Attack", color=clr.OFF_WHITE):
                     continue
-                self.mouse.click()
+                pag.click()
                 time.sleep(0.5)
 
             # While in combat
             while api_morg.get_is_in_combat():
                 # Check to eat food
                 if self.get_hp() < self.hp_threshold:
-                    self.__eat(api_status)
+                    self.__eat(api_morg)
+                self.check_antifire()
                 current_prayer = self.get_prayer()
                 if current_prayer <= 40:
                     self.prayer_pot()
@@ -155,6 +156,12 @@ class OSRSCombat(AaronFunctions):
     def refill_cannon(self):
         if self.chatbox_text_RED_first_line(contains="cannon") or self.chatbox_text_RED_first_line(contains="broken"):
             self.click_color(clr.GREEN)
+            counter = 0
+            while not self.chatbox_text_BLACK_first_line(contains="load"):
+                time.sleep(1)
+                counter += 1
+                if counter == 5:
+                    return self.refill_cannon()
 
         return
 
@@ -184,7 +191,7 @@ class OSRSCombat(AaronFunctions):
         return
 
 
-    def __eat(self, api: StatusSocket):
+    def __eat(self, api: MorgHTTPSocket):
         self.log_msg("HP is low.")
         food_slots = api.get_inv_item_indices(item_ids.all_food)
         if len(food_slots) == 0:
@@ -222,32 +229,33 @@ class OSRSCombat(AaronFunctions):
             self.stop()
             
     def check_antifire(self):
-        super_rest_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(1).png")
-        super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
-        super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
-        super_rest_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(4).png")
-        if self.chatbox_text_ANTIFIRE(contains="expire"):
+        ext_super_antifire_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(1).png")
+        ext_super_antifire_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(2).png")
+        ext_super_antifire_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(3).png")
+        ext_super_antifire_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(4).png")
+        if self.chatbox_text_ANTIFIRE(contains="Your"):
             self.log_msg("Antifire about to expire.")
-            if super_rest_1 := imsearch.search_img_in_rect(super_rest_1_img, self.win.control_panel, confidence=0.04):
-                self.log_msg("Found super restore (1)")
-                self.mouse.move_to(super_rest_1.random_point())
+            if ext_super_antifire_1 := imsearch.search_img_in_rect(ext_super_antifire_1_img, self.win.control_panel, confidence=0.04):
+                self.log_msg("Found ext super antifire (1)")
+                self.mouse.move_to(ext_super_antifire_1.random_point())
                 self.mouse.click()
-            elif super_rest_2 := imsearch.search_img_in_rect(super_rest_2_img, self.win.control_panel, confidence=0.03):
-                self.log_msg("Found super restore (2)")
-                self.mouse.move_to(super_rest_2.random_point())
+            elif ext_super_antifire_2 := imsearch.search_img_in_rect(ext_super_antifire_2_img, self.win.control_panel, confidence=0.03):
+                self.log_msg("Found ext super antifire (2)")
+                self.mouse.move_to(ext_super_antifire_2.random_point())
                 self.mouse.click()
-            elif super_rest_3 := imsearch.search_img_in_rect(super_rest_3_img, self.win.control_panel, confidence=0.04):
-                self.log_msg("Found super restore (3)")
-                self.mouse.move_to(super_rest_3.random_point())
+            elif ext_super_antifire_3 := imsearch.search_img_in_rect(ext_super_antifire_3_img, self.win.control_panel, confidence=0.04):
+                self.log_msg("Found ext super antifire (3)")
+                self.mouse.move_to(ext_super_antifire_3.random_point())
                 self.mouse.click()
-            elif super_rest_4 := imsearch.search_img_in_rect(super_rest_4_img, self.win.control_panel, confidence=0.02):
-                self.log_msg("Found super restore (4)")
-                self.mouse.move_to(super_rest_4.random_point())
+            elif ext_super_antifire_4 := imsearch.search_img_in_rect(ext_super_antifire_4_img, self.win.control_panel, confidence=0.02):
+                self.log_msg("Found ext super antifire (4)")
+                self.mouse.move_to(ext_super_antifire_4.random_point())
                 self.mouse.click()
 
     def lootables(self) -> list:
         ITEMS = [
             "Rune med helm",
+            "Brimstone key",
             "Rune bar",
             "Blood rune",
             "Rune Battleaxe",

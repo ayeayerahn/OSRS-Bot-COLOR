@@ -5,11 +5,6 @@ import utilities.imagesearch as imsearch
 import pyautogui as pag
 import utilities.ocr as ocr
 from model.osrs.AaronScripts.aaron_functions import AaronFunctions
-from model.osrs.osrs_bot import OSRSBot
-from utilities.imagesearch import search_img_in_rect
-from utilities.geometry import Rectangle, Point
-from pathlib import Path
-
 
 class OSRSpotionmaker(AaronFunctions):
     def __init__(self):
@@ -18,7 +13,7 @@ class OSRSpotionmaker(AaronFunctions):
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during UI-less testing)
         self.running_time = 1
-        self.potion_list = ['Super Combats', 'Prayer', 'Super Restore', 'Stamina']
+        self.potion_list = ['Super Combats', 'Prayer', 'Super Restore', 'Anti-Venom +']
 
     def create_options(self):
         self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
@@ -62,8 +57,8 @@ class OSRSpotionmaker(AaronFunctions):
             primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "ranarr_potion_(unf)_bank.png")
         elif self.potion_to_make == 'Super Restore':
             primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "snapdragon_potion_(unf)_bank.png")
-        elif self.potion_to_make == 'Stamina':
-            primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_energy(4).png")
+        elif self.potion_to_make == 'Anti-Venom +':
+            primary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "anti-venom(4)_bank.png")
         return primary_bank_img
     
     def get_secondary_bank_img(self):
@@ -71,27 +66,28 @@ class OSRSpotionmaker(AaronFunctions):
             secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "snape_grass_bank.png")
         elif self.potion_to_make == 'Super Restore':
             secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "red_spiders'_eggs_bank.png")
-        elif self.potion_to_make == 'Stamina':
-            secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "amylase_crystal_bank.png")
+        elif self.potion_to_make == 'Anti-Venom +':
+            secondary_bank_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "torstol_bank.png")
 
         return secondary_bank_img 
     
     def make_potions(self):
-        primary_img = self.get_primary_bank_img() 
-        secondary_img = self.get_secondary_bank_img() 
-        if primary := self.wait_until_img(primary_img, self.win.control_panel):
+        primary_bank_img = self.get_primary_bank_img() 
+        secondary_bank_img = self.get_secondary_bank_img() 
+        if secondary := self.wait_until_img(secondary_bank_img, self.win.control_panel):
+            self.log_msg("Secondary found in inventory")
+            self.mouse.move_to(secondary.random_point())
+            self.mouse.click()
+        else:
+            self.log_msg("Secondary was not found in inventory. Stopping script.")
+            
+        if primary := self.wait_until_img(primary_bank_img, self.win.control_panel):
             self.log_msg("Primary found in inventory")
             self.mouse.move_to(primary.random_point())
             self.mouse.click()
         else:
             self.log_msg("Primary was not found in inventory. Stopping script.")
             
-        if secondary := self.wait_until_img(secondary_img, self.win.control_panel):
-            self.log_msg("Secondary found in inventory")
-            self.mouse.move_to(secondary.random_point())
-            self.mouse.click()
-        else:
-            self.log_msg("Secondary was not found in inventory. Stopping script.")
         time.sleep(1)
         pag.press('space')
         time.sleep(5) # Guarantees that if the last message  was amulet breaking, we don't start everything
@@ -171,28 +167,7 @@ class OSRSpotionmaker(AaronFunctions):
                 self.stop()           
         else:
             self.log_msg("Ran out of secondary. Stopping script.")
-            self.stop()    
-        # if primary := imsearch.search_img_in_rect(primary_bank, self.win.game_view):
-        #     self.log_msg("Found primary in bank view")
-        #     self.mouse.move_to(primary.random_point())
-        #     if self.mouseover_text(contains="Release"):
-        #         self.log_msg("Ran out of primary. Stopping script.")
-        #         self.stop()
-        #     self.mouse.click()
-        # else:
-        #     self.log_msg("Ran out of primary. Stopping script.")
-        #     self.stop()
-            
-        # if secondary := imsearch.search_img_in_rect(secondary_bank, self.win.game_view):
-        #     self.log_msg("Found secondary in bank view")
-        #     self.mouse.move_to(secondary.random_point())
-        #     if self.mouseover_text(contains="Release"):
-        #         self.log_msg("Ran out of secondary. Stopping script.")
-        #         self.stop()
-        #     self.mouse.click()
-        # else:
-        #     self.log_msg("Ran out of secondary. Stopping script.")
-        #     self.stop()    
+            self.stop()      
         while not self.search_slot_28():
             time.sleep(0.5)
         self.log_msg("Exiting bank.") 

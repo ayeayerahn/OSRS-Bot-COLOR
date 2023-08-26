@@ -70,6 +70,38 @@ class MorgHTTPSocket:
                 return False
         return True
     
+    def get_boosted_level(self, skill: str) -> int: 
+        """"
+        Gets Boosted Level
+        Args:
+            skill : name of the skill  e.g "Attack" | "Strength". Refer to stat_names.py
+        Returns:
+            The level as an int, or -1 if an error occured .
+            """
+        data = self.__do_get(endpoint=self.stats_endpoint)
+        try:
+            boosted_level = next(int(i["boostedLevel"]) for i in data[1:] if i["stat"] == skill)
+        except StopIteration:
+            print(f"Invalid stat name: {skill}. Consider using the `stat_names` utility.")
+            return -1
+        return boosted_level
+
+    def get_is_boosted(self, skill:str) -> bool:
+
+        """"
+        Compares real level to boosted level of a skill.
+        Args:
+            skill : name of the skill  e.g "Attack" | "Strength". Refer to stat_names.py
+        Returns: 
+            True if skill is boosted by atleast 1. False if not. 
+        """
+
+        real_level = self.get_skill_level(skill)
+        boosted_level = self.get_boosted_level(skill)   
+        if real_level != -1 and boosted_level != -1:
+            return boosted_level > real_level
+        return False
+    
     def get_inv(self):
         """
         Gets the users inventory

@@ -9,7 +9,7 @@ from .AaronScripts.powerminer import OSRSpowerminer
 #from .AaronScripts.ardyrooftops import OSRSardyrooftops
 #from .AaronScripts.GOTR import OSRSGOTR
 from.AaronScripts.truebloods import OSRStruebloods
-#from .AaronScripts.chop_and_firemake import OSRSchop_and_firemake
+from .AaronScripts.chop_and_firemake import OSRSchop_and_firemake
 #from .AaronScripts.canifis_rooftops import OSRScanifisrooftops
 #from .AaronScripts.construction import OSRSConstruction
 #from .AaronScripts.wintertodt import OSRSwintertodt
@@ -18,8 +18,10 @@ from .AaronScripts.mlm import OSRSmlm
 # from .AaronScripts.ectofuntus import OSRSectofuntus
 from .AaronScripts.gilded_altar import OSRSgildedaltar
 # from .AaronScripts.wines import OSRSwines
-from .AaronScripts.potion_maker import OSRSpotionmaker
-from .AaronScripts.blastfurnace import OSRSblastfurnace
-from .AaronScripts.chinchompas import OSRSHunter
-from .AaronScripts.fly_fishing import OSRSfishing
+# from .AaronScripts.potion_maker import OSRSpotionmaker
+# from .AaronScripts.blastfurnace import OSRSblastfurnace
+# from .AaronScripts.chinchompas import OSRSHunter
+# from .AaronScripts.fly_fishing import OSRSfishing
 from .AaronScripts.aaron_combat import OSRSCombat
+from .AaronScripts.aerial_fishing import OSRSaerialfishing
+# from .AaronScripts.afk_nmz import OSRSafk_nmz

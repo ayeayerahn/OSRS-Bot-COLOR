@@ -204,9 +204,9 @@ if __name__ == "__main__":
     # PARAMETERS
     # ----------------
     area = win.chat
-    font = PLAIN_12
-    color = [clr.BLACK]
-    text = ["Welcome", "Old", "RuneScape"]  # find_text only
+    font = PLAIN_11
+    color = [clr.POISON]
+    text = ["Your"]  # find_text only
 
     method = find_text
     # ----------------

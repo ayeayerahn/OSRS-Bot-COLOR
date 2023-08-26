@@ -1,12 +1,11 @@
 import time
 import utilities.color as clr
 import utilities.api.item_ids as ids
-import utilities.random_util as rd
-from model.osrs.osrs_bot import OSRSBot
 from utilities.api.morg_http_client import MorgHTTPSocket
+from model.osrs.AaronScripts.aaron_functions import AaronFunctions
 
 
-class OSRSchop_and_firemake(OSRSBot):
+class OSRSchop_and_firemake(AaronFunctions):
     def __init__(self):
         bot_title = "Chop and Firemake"
         description = "This bot will light logs."
@@ -42,7 +41,7 @@ class OSRSchop_and_firemake(OSRSBot):
         while time.time() - start_time < end_time:
 
             self.woodcut(api_m)
-            self.firemake(api_m)
+            # self.firemake(api_m)
 
             self.update_progress((time.time() - start_time) / end_time)
 
@@ -51,19 +50,21 @@ class OSRSchop_and_firemake(OSRSBot):
         self.stop()
 
     def woodcut(self, api_m: MorgHTTPSocket):
-        if not api_m.get_is_inv_full():
+        self.activate_special()
+        if not self.search_slot_28():
             if tree := self.get_nearest_tag(clr.GREEN):
                 self.mouse.move_to(tree.random_point())
                 self.mouse.click()
                 self.log_msg("Wooducutting until we have a full inventory.")
-                time.sleep(3)
+                time.sleep(2)
         while not api_m.get_is_player_idle():
-            time.sleep(1)
-        if api_m.get_is_inv_full():
+            time.sleep(0.5)
+        if self.search_slot_28():
             self.log_msg("Inventory is full. Time to firemake.")
-            return self.firemaking_spot()
-        else:
-            return self.woodcut(api_m)       
+            self.drop_all(skip_rows=0, skip_slots=[0, 1])
+        #     return self.firemaking_spot()
+        # else:
+        #     return self.woodcut(api_m)       
 
     def firemake(self, api_m: MorgHTTPSocket):
         oak_logs = api_m.get_inv_item_indices(ids.logs)
