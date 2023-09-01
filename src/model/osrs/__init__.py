@@ -25,3 +25,4 @@ from .AaronScripts.gilded_altar import OSRSgildedaltar
 from .AaronScripts.aaron_combat import OSRSCombat
 from .AaronScripts.aerial_fishing import OSRSaerialfishing
 # from .AaronScripts.afk_nmz import OSRSafk_nmz
+from .AaronScripts.anvil_smith import OSRSanvil_smith
