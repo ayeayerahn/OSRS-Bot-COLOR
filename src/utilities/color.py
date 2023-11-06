@@ -63,8 +63,9 @@ LIGHT_CYAN = Color([0, 183, 255])
 TEXT_RED = Color([239,16,32])
 DODGY_NECKLACE_RED = Color([255, 255, 1])
 TEXT_GREEN = Color([6, 96, 12])
-ANTIFIRE = Color([127, 0, 124])
+ANTIFIRE = Color([100, 0, 95], [150, 10, 165])
 POISON = Color([94, 0, 90])
+ABSORPTION_POTION = Color([0, 77, 0], [0, 115, 0])
 
 """Colors for use with semi-transparent text"""
 OFF_CYAN = Color([0, 200, 200], [70, 255, 255])

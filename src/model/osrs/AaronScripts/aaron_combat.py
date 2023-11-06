@@ -7,6 +7,7 @@ import utilities.imagesearch as imsearch
 import utilities.color as clr
 import utilities.game_launcher as launcher
 import pyautogui as pag
+import utilities.ocr as ocr
 from model.osrs.AaronScripts.aaron_functions import AaronFunctions
 from model.bot import BotStatus
 from model.osrs.osrs_bot import OSRSBot
@@ -17,36 +18,31 @@ from utilities.api.status_socket import StatusSocket
 class OSRSCombat(AaronFunctions):
     def __init__(self):
         bot_title = "Combat"
-        description = "This bot kills NPCs. Position your character near some NPCs and highlight them.\nTHIS SCRIPT IS AN EXAMPLE, DO NOT USE LONGTERM."
+        description = "This."
         super().__init__(bot_title=bot_title, description=description)
-        self.running_time: int = 1
+        self.running_time: 200
         self.loot_items: str = self.lootables()
-        self.hp_threshold: int = 0
+        self.hp_threshold: int = 35
+        self.cannon = False
+        self.loop_to_run = 0
 
     def create_options(self):
-        self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
+        # self.options_builder.add_slider_option("running_time", "How long to run (minutes)?", 1, 500)
         # self.options_builder.add_text_edit_option("loot_items", "Loot items (requires re-launch):", "E.g., Coins, Dragon bones")
-        self.options_builder.add_slider_option("hp_threshold", "Low HP threshold (0-100)?", 0, 100)
+        # self.options_builder.add_slider_option("hp_threshold", "Low HP threshold (0-100)?", 0, 100)
+        self.options_builder.add_dropdown_option("cannon", "Cannon?", ["Yes", "No"])
 
     def save_options(self, options: dict):
-        for option in options:
-            if option == "running_time":
-                self.running_time = options[option]
-            # elif option == "loot_items":
-            #     self.loot_items = options[option]
-            elif option == "hp_threshold":
-                self.hp_threshold = options[option]
-            else:
-                self.log_msg(f"Unknown option: {option}")
-                print("Developer: ensure that the option keys are correct, and that options are being unpacked correctly.")
-                self.options_set = False
-                return
-
+        self.running_time = 200
+        if options["cannon"] == "Yes":
+            self.loop_to_run = 1
+        elif options["cannon"] == "No":
+            self.loop_to_run = 0
         self.log_msg(f"Running time: {self.running_time} minutes.")
-        self.log_msg(f'Loot items: {self.loot_items or "None"}.')
-        self.log_msg(f"Bot will eat when HP is below: {self.hp_threshold}.")
-        self.log_msg("Options set successfully. Please launch RuneLite with the button on the right to apply settings.")
+        self.log_msg("Options set successfully.")
 
+        # self.log_msg(f'Loot items: {self.loot_items or "None"}.')
+        # self.log_msg(f"Bot will eat when HP is below: {self.hp_threshold}.")
         self.options_set = True
 
     def launch_game(self):
@@ -85,86 +81,108 @@ class OSRSCombat(AaronFunctions):
         )
 
     def main_loop(self):
-        self.log_msg("WARNING: This script is for testing and may not be safe for personal use. Please modify it to suit your needs.")
-
         # Setup API
         api_morg = MorgHTTPSocket()
 
-        self.toggle_auto_retaliate(True)
-
-        self.log_msg("Selecting inventory...")
-        self.mouse.move_to(self.win.cp_tabs[3].random_point())
-        self.mouse.click()
-
-        failed_searches = 0
+        if self.loop_to_run == 1:
+            self.log_msg("Running cannon loop")
+        elif self.loop_to_run == 0:
+            self.log_msg("Running loop without cannon")
+        # failed_searches = 0
 
         # Main loop
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
-            self.check_task_complete()
-            # If inventory is full...
-            if self.search_slot_28():
-                self.log_msg("Inventory is full. Idk what to do.")
-                self.set_status(BotStatus.STOPPED)
-                return
-
-            # While not in combat
-            while not api_morg.get_is_in_combat():
-                # Find a target
-                target = self.get_nearest_tagged_NPC()
-                if target is None:
-                    failed_searches += 1
-                    if failed_searches % 10 == 0:
-                        self.log_msg("Searching for targets...")
-                    if failed_searches > 60:
-                        # If we've been searching for a whole minute...
-                        self.__logout("No tagged targets found. Logging out.")
-                        return
-                    time.sleep(1)
-                    continue
-                failed_searches = 0
-
-                # Click target if mouse is actually hovering over it, else recalculate
-                pag.moveTo(target.random_point())
-                if not self.mouseover_text(contains="Attack", color=clr.OFF_WHITE):
-                    continue
-                pag.click()
-                time.sleep(0.5)
-
-            # While in combat
-            while api_morg.get_is_in_combat():
-                # Check to eat food
-                if self.get_hp() < self.hp_threshold:
-                    self.__eat(api_morg)
-                self.check_antifire()
-                current_prayer = self.get_prayer()
-                if current_prayer <= 40:
-                    self.prayer_pot()
-                self.refill_cannon()
-                time.sleep(1)
-
-            # Loot all highlighted items on the ground
-            if self.loot_items:
-                self.__loot(api_morg)
+            
+            if self.loop_to_run == 1:
+                self.cannon_loop(api_morg)
+            else:
+                self.non_cannon_loop(api_morg)
 
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
         self.__logout("Finished.")
+        
+    def loot_ground_items(self, api_morg):
+        if self.loot_items:
+            self.__loot(api_morg)
+        return
+            
+    def return_to_cannon(self):     # Still need to test this
+        self.log_msg("Returning to cannon spot.")
+        cannon = self.get_nearest_tag(color=clr.GREEN)
+        while True:
+            try:
+                self.mouse.move_to(cannon.center())
+            except AttributeError:
+                self.log_msg("Couldn't find the green box. Trying again.") 
+                time.sleep(1) 
+                continue      
+            self.mouse.right_click()
+            if fire_cannon := ocr.find_text("Fire", self.win.game_view, ocr.PLAIN_12, clr.OFF_WHITE):
+                self.mouse.move_to(fire_cannon[0])
+                self.mouse.click()
+        
+    def check_prayer(self):
+        if self.get_prayer() <= 15:
+            self.refill_cannon()
+            self.prayer_pot()
 
     def refill_cannon(self):
         if self.chatbox_text_RED_first_line(contains="cannon") or self.chatbox_text_RED_first_line(contains="broken"):
-            self.click_color(clr.GREEN)
-            counter = 0
-            while not self.chatbox_text_BLACK_first_line(contains="load"):
-                time.sleep(1)
-                counter += 1
-                if counter == 5:
-                    return self.refill_cannon()
-
+            self.click_cannon()
         return
+    
+    def click_cannon(self):
+        if self.mouseover_text(contains="Fire Dwarf", color=[clr.OFF_WHITE, clr.OFF_CYAN]):
+            self.log_msg("Mouse already on cannon. Just going to click.")
+            self.mouse.click()
+            return
+        else:
+            while True:
+                cannon = self.get_nearest_tag(color=clr.GREEN)
+                try:
+                    self.mouse.move_to(cannon.center())
+                except AttributeError:
+                    self.log_msg("Couldn't find the green box. Trying again.")
+                    time.sleep(0.5)
+                    return self.click_cannon()
+                self.mouse.click()
+                break
+            return
 
+    def pickup_cannon(self):
+        cannon = self.get_nearest_tag(color=clr.GREEN)
+        while True:
+            try:
+                self.mouse.move_to(cannon.center())
+            except AttributeError:
+                self.log_msg("Couldn't find the green box. Trying again.")
+                return self.pickup_cannon()
+            self.mouse.right_click()
+            if fire_cannon := ocr.find_text("Pick", self.win.game_view, ocr.BOLD_12, clr.WHITE):
+                self.mouse.move_to(fire_cannon[0].get_center())
+                self.mouse.click()
+                break
+        return
+    
+    def check_bracelet(self):
+        expeditious_bracelet = imsearch.BOT_IMAGES.joinpath("Aarons_images", "expeditious_bracelet.png")
+        slaughter_bracelet = imsearch.BOT_IMAGES.joinpath("Aarons_images", "bracelet_of_slaughter.png")
+       
+        if self.chatbox_text_RED_slayer_bracelet(contains="dust"):
+            if expeditious := imsearch.search_img_in_rect(expeditious_bracelet, self.win.control_panel):
+                self.mouse.move_to(expeditious.random_point())
+                self.mouse.click()
+            elif slaughter := imsearch.search_img_in_rect(slaughter_bracelet, self.win.control_panel):
+                self.mouse.move_to(slaughter.random_point())
+                self.mouse.click()
+            if self.loop_to_run == 1:
+                self.click_cannon()
+        return
+                
     def prayer_pot(self):
         super_rest_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(2).png")
         super_rest_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "super_restore(3).png")
@@ -189,7 +207,6 @@ class OSRSCombat(AaronFunctions):
             self.mouse.click()
         time.sleep(3)
         return
-
 
     def __eat(self, api: MorgHTTPSocket):
         self.log_msg("HP is low.")
@@ -224,18 +241,28 @@ class OSRSCombat(AaronFunctions):
 
     def check_task_complete(self):
         if self.chatbox_text_RED(contains="Slayer"):
-            self.log_msg("Task completed. Teleporting to the crafting guild and stopping script.")
-            self.craft_cape_teleport()
+            self.log_msg("Task completed. Teleporting to house and stopping script.")
+            self.con_cape_teleport()
             self.stop()
+            
+    def check_task_complete_cannon(self):
+        if self.chatbox_text_RED(contains="Slayer"):
+            self.log_msg("Task completed. Picking up cannon.")
+            self.pickup_cannon()
+            time.sleep(3)
+            self.con_cape_teleport()
+            self.stop()        
             
     def check_antifire(self):
         ext_super_antifire_1_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(1).png")
         ext_super_antifire_2_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(2).png")
         ext_super_antifire_3_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(3).png")
         ext_super_antifire_4_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "extended_super_antifire(4).png")
-        if self.chatbox_text_ANTIFIRE(contains="Your"):
+        if self.chatbox_text_ANTIFIRE(contains="antifire"):
             self.log_msg("Antifire about to expire.")
-            if ext_super_antifire_1 := imsearch.search_img_in_rect(ext_super_antifire_1_img, self.win.control_panel, confidence=0.04):
+            if self.chatbox_text_BLACK(contains="extended"):
+                pass
+            elif ext_super_antifire_1 := imsearch.search_img_in_rect(ext_super_antifire_1_img, self.win.control_panel, confidence=0.04):
                 self.log_msg("Found ext super antifire (1)")
                 self.mouse.move_to(ext_super_antifire_1.random_point())
                 self.mouse.click()
@@ -252,12 +279,76 @@ class OSRSCombat(AaronFunctions):
                 self.mouse.move_to(ext_super_antifire_4.random_point())
                 self.mouse.click()
 
+    def cannon_loop(self, api_morg: MorgHTTPSocket):
+        # While in combat
+        while True:
+            while api_morg.get_is_in_combat():
+                # Check to eat food
+                if self.get_hp() < self.hp_threshold:
+                    self.__eat(api_morg)
+                self.check_antifire()   # Not working
+                self.check_prayer()
+                self.refill_cannon()
+                self.check_bracelet()
+                self.loot_ground_items(api_morg)
+                self.check_task_complete_cannon()
+                time.sleep(1)
+
+    def non_cannon_loop(self, api_morg: MorgHTTPSocket):
+        failed_searches = 0
+        # While not in combat
+        while not api_morg.get_is_in_combat():
+            self.check_task_complete()
+            # Find a target
+            target = self.get_nearest_tagged_NPC()
+            if target is None:
+                failed_searches += 1
+                if failed_searches % 10 == 0:
+                    self.log_msg("Searching for targets...")
+                if failed_searches > 60:
+                    # If we've been searching for a whole minute...
+                    self.__logout("No tagged targets found. Logging out.")
+                    return
+                time.sleep(1)
+                continue
+            failed_searches = 0
+
+            # Click target if mouse is actually hovering over it, else recalculate
+            pag.moveTo(target.random_point())
+            if not self.mouseover_text(contains="Attack", color=clr.OFF_WHITE):
+                continue
+            pag.click()
+            time.sleep(1)
+
+        # While in combat
+        while api_morg.get_is_in_combat():
+            # Check to eat food
+            # if self.get_hp() < self.hp_threshold:
+            if self.get_hp() < 40:
+                self.__eat(api_morg)
+                time.sleep(1)
+            self.check_antifire()
+            self.check_prayer()
+            self.check_bracelet()
+            time.sleep(1)
+        # self.loot_ground_items(api_morg)
+
+        # Loot all highlighted items on the ground
+        if self.loot_items:
+            self.__loot(api_morg)
+            self.check_task_complete()
+    
     def lootables(self) -> list:
+        # issue items:
+        # Snapdragon seed
+        # Rune platelegs
         ITEMS = [
             "Rune med helm",
+            "Mystic robe bottom (dark)", 
+            "Lava Battlestaff",
+            "Mystic robe top (dark)",
             "Brimstone key",
             "Rune bar",
-            "Blood rune",
             "Rune Battleaxe",
             "Runite bar",
             "Rune 2h sword",
@@ -315,5 +406,6 @@ class OSRSCombat(AaronFunctions):
             "Occult necklace",
             "Smoke rune",
             "Runite bolts",
+            "Battlestaff"
             ]
         return ITEMS

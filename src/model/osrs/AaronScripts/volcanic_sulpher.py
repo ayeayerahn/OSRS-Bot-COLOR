@@ -11,10 +11,10 @@ from utilities.geometry import Rectangle, Point
 from pathlib import Path
 
 
-class OSRStruebloods(AaronFunctions):
+class OSRSvolcanicsulpher(AaronFunctions):
     def __init__(self):
-        bot_title = "True Blood RC"
-        description = "1. Pouch, 2. Essence, 3. Con cape, 4. Craft cape"
+        bot_title = "Volcanic Sulpher"
+        description = ""
         super().__init__(bot_title=bot_title, description=description)
         # Set option variables below (initial value is only used during headless testing)
         self.running_time = 500
@@ -49,26 +49,19 @@ class OSRStruebloods(AaronFunctions):
         start_time = time.time()
         end_time = self.running_time * 60
         while time.time() - start_time < end_time:
-    # 1. Open bank, retrieve supplies, and close bank
-        # 1a. Open bank
-            self.open_bank_af()
-        # 1b. Retrieve supplies
-            self.get_supplies()
-            
-    # 2. Go to fairy ring
-            self.start_run()
-            
-    # 3. Click necessary obstacles to reach the blood altar
-            self.run_to_altar()
-            time.sleep(3.3)
-            self.enter_altar()
-            
-    #4. Craft runes
-            self.click_altar()
-            
-    #5. Teleport to house to replenish run energy and return to Castle Wars to bank
-            self.return_to_bank()
-            self.wait_until_color(color=clr.CYAN, timeout=10)
+            volcanic_sulpher = self.get_nearest_tag(clr.GREEN)
+            if self.search_slot_28():
+                self.drop_all()
+            if volcanic_sulpher:
+                self.mouse.move_to(volcanic_sulpher.random_point())
+                self.mouse.click()
+                while volcanic_sulpher:
+                    volcanic_sulpher = self.get_nearest_tag(clr.GREEN)
+                    if self.search_slot_28():
+                        self.drop_all()
+                        break
+                    time.sleep(1)
+            time.sleep(1)
 
             self.update_progress((time.time() - start_time) / end_time)
 

@@ -22,13 +22,14 @@ class AaronFunctions(OSRSBot):
             self.mouse.click()
             return True
 
-    def click_color(self, color: clr):
+    def click_color_af(self, color: clr, contains: str = None):
         """This will click when the nearest tag is not none."""
         count = 0
         while True:
             if found := self.get_nearest_tag(color):
                 if count < 10:
                     self.mouse.move_to(found.random_point())
+                    # pag.moveTo(found.random_point())
                     if self.mouse.click(check_red_click=True):
                         break
                     else:
@@ -89,7 +90,7 @@ class AaronFunctions(OSRSBot):
         while True:
             bank = self.get_nearest_tag(clr.CYAN)
             pag.moveTo(bank.random_point())
-            if not self.mouseover_text(contains="Bank", color=clr.OFF_WHITE):
+            if not self.mouseover_text(contains="Use", color=clr.OFF_WHITE):
                 continue
             while not self.mouse.click(check_red_click=True):
                 bank = self.get_nearest_tag(clr.CYAN)
@@ -118,8 +119,17 @@ class AaronFunctions(OSRSBot):
     def craft_cape_teleport(self):
         craft_cape_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "crafting_cape(t).png")
         if craft_cape := imsearch.search_img_in_rect(craft_cape_img, self.win.control_panel):
-            self.mouse.move_to(craft_cape.random_point())
+            pag.moveTo(craft_cape.random_point())
             self.mouse.click()
+        time.sleep(3)
+        
+    def con_cape_teleport(self):
+        con_cape_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Construct._cape(t).png")
+        if con_cape := imsearch.search_img_in_rect(con_cape_img, self.win.control_panel):
+            pag.moveTo(con_cape.random_point())
+            self.mouse.click()
+            # self.mouse.move_to(con_cape.random_point())
+            # self.mouse.click()
         time.sleep(3)
     
     def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
