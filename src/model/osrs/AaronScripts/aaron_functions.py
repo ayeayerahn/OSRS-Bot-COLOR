@@ -22,13 +22,14 @@ class AaronFunctions(OSRSBot):
             self.mouse.click()
             return True
 
-    def click_color(self, color: clr):
+    def click_color_af(self, color: clr, contains: str = None):
         """This will click when the nearest tag is not none."""
         count = 0
         while True:
             if found := self.get_nearest_tag(color):
                 if count < 10:
                     self.mouse.move_to(found.random_point())
+                    # pag.moveTo(found.random_point())
                     if self.mouse.click(check_red_click=True):
                         break
                     else:
@@ -72,8 +73,9 @@ class AaronFunctions(OSRSBot):
     def deposit_all(self): 
         deposit_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "deposit.png") 
         if deposit := imsearch.search_img_in_rect(deposit_img, self.win.game_view):
-            self.mouse.move_to(deposit.random_point())   
-            self.mouse.click() 
+            pag.moveTo(deposit.random_point())   
+            pag.click()
+            time.sleep(0.5)
             return
         
     def open_bank_af(self):
@@ -85,19 +87,23 @@ class AaronFunctions(OSRSBot):
             deposit_slots (int) - Inventory position of each different item to deposit.
         """
         # move mouse to bank and click while not red click
-        bank = self.get_nearest_tag(clr.CYAN)
-        self.mouse.move_to(bank.random_point())
-        while not self.mouse.click(check_red_click=True):
+        while True:
             bank = self.get_nearest_tag(clr.CYAN)
-            self.mouse.move_to(bank.random_point())
+            pag.moveTo(bank.random_point())
+            if not self.mouseover_text(contains="Use", color=clr.OFF_WHITE):
+                continue
+            while not self.mouse.click(check_red_click=True):
+                bank = self.get_nearest_tag(clr.CYAN)
+                pag.moveTo(bank.random_point())
+            break
 
         wait_time = time.time()
         while not self.is_bank_open():
             if time.time() - wait_time > 20:
-                self.mouse.move_to(bank.random_point())
+                pag.moveTo(bank.random_point())
                 while not self.mouse.click(check_red_click=True):
                     bank = self.get_nearest_tag(clr.CYAN)
-                    self.mouse.move_to(bank.random_point())
+                    pag.moveTo(bank.random_point())
             # if we waited for 17 seconds, break out of loop
             if time.time() - wait_time > 30:
                 self.log_msg("We clicked on the bank but bank is not open after 12 seconds, bot is quiting...")
@@ -113,8 +119,17 @@ class AaronFunctions(OSRSBot):
     def craft_cape_teleport(self):
         craft_cape_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "crafting_cape(t).png")
         if craft_cape := imsearch.search_img_in_rect(craft_cape_img, self.win.control_panel):
-            self.mouse.move_to(craft_cape.random_point())
+            pag.moveTo(craft_cape.random_point())
             self.mouse.click()
+        time.sleep(3)
+        
+    def con_cape_teleport(self):
+        con_cape_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "Construct._cape(t).png")
+        if con_cape := imsearch.search_img_in_rect(con_cape_img, self.win.control_panel):
+            pag.moveTo(con_cape.random_point())
+            self.mouse.click()
+            # self.mouse.move_to(con_cape.random_point())
+            # self.mouse.click()
         time.sleep(3)
     
     def wait_until_img(self, img: Path, screen: Rectangle, timeout: int = 10):
