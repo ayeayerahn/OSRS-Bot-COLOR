@@ -103,7 +103,8 @@ class OSRSCombat(AaronFunctions):
             self.update_progress((time.time() - start_time) / end_time)
 
         self.update_progress(1)
-        self.__logout("Finished.")
+        self.log_msg("Finished.")
+        self.stop()
         
     def loot_ground_items(self, api_morg):
         if self.loot_items:
@@ -233,11 +234,6 @@ class OSRSCombat(AaronFunctions):
                     time.sleep(1)
                     break
                 time.sleep(1)
-
-    def __logout(self, msg):
-        self.log_msg(msg)
-        self.logout()
-        self.stop()
 
     def check_task_complete(self):
         if self.chatbox_text_RED(contains="Slayer"):
