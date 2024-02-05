@@ -252,14 +252,14 @@ class OSRSGOTR(OSRSBot):
         remains = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
-        # Check if inventory is full
-        self.huge_guardian_remains_is_inv_full()
-        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        time.sleep(1)
-        #self.repair_pouches(api_m)
-        self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
-        self.mouse.click()
+        # # Check if inventory is full
+        # self.huge_guardian_remains_is_inv_full()
+        # self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
+        # self.mouse.click()
+        # time.sleep(1)
+        # #self.repair_pouches(api_m)
+        # self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
+        # self.mouse.click()
         # Check if inventory is full
         self.huge_guardian_remains_is_inv_full()
         # Return to the main area via blue portal
