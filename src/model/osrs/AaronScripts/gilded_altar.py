@@ -108,11 +108,11 @@ class OSRSgildedaltar(OSRSBot):
     def click_bones(self):
         bones_bank_img = self.get_bones_img()
         if bones := imsearch.search_img_in_rect(bones_bank_img, self.win.inventory_slots[27]):
-                if altar := self.get_nearest_tag(clr.CYAN):
-                    self.mouse.move_to(bones.random_point())
-                    self.mouse.click()
-                    self.mouse.move_to(altar.random_point())
-                    self.mouse.click()
+            if altar := self.get_nearest_tag(clr.CYAN):
+                self.mouse.move_to(bones.random_point())
+                self.mouse.click()
+                self.mouse.move_to(altar.random_point())
+                self.mouse.click()
         time.sleep(4)
         while True:
             if bones := imsearch.search_img_in_rect(bones_bank_img, self.win.inventory_slots[27]):
@@ -121,6 +121,7 @@ class OSRSgildedaltar(OSRSBot):
                     self.mouse.click()
                     self.mouse.move_to(altar.random_point())
                     self.mouse.click()
+                    time.sleep(0.3)
             else:
                 break
             

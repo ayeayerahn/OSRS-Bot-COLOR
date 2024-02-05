@@ -28,7 +28,7 @@ class OSRSTest_Bot(OSRSBot):
         bot_title = "Test Bot"
         description = "This is a test Bot to check functions inside of your osbc/runelite enviorment"
         super().__init__(bot_title=bot_title, description=description)
-        self.running_time = 1
+        self.running_time = 300
         self.Client_Info = None
         self.win_name = None
         self.pid_number = None
@@ -92,13 +92,20 @@ class OSRSTest_Bot(OSRSBot):
            #self.save_window(self.win.game_view,"game_view")
            #self.contour_check(self.win.game_view,clr.BLACK)
         #    self._pick_up_loot(self.lootables())
-            yellow_marker_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "yellow_arrow_map_marker.png")
-            if yellow_marker := imsearch.search_img_in_rect(yellow_marker_img, self.win.game_view):
-                print(yellow_marker)
-                self.log_msg("Found yellow marker")
-            else:
-                self.log_msg("Did not find yellow marker.")
-            time.sleep(0.1)
+            # yellow_marker_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "yellow_arrow_map_marker.png")
+            # if yellow_marker := imsearch.search_img_in_rect(yellow_marker_img, self.win.game_view):
+            #     print(yellow_marker)
+            #     self.log_msg("Found yellow marker")
+            # else:
+            #     self.log_msg("Did not find yellow marker.")
+            # time.sleep(0.1)
+            altar = self.get_nearest_tag(clr.GREEN)
+            self.mouse.move_to(self.win.inventory_slots[0].random_point())
+            self.mouse.click()
+            time.sleep(0.2)
+            self.mouse.move_to(altar.random_point())
+            self.mouse.click()
+            time.sleep(0.2)
            
     def ocr_extract_text_check(self,window,font,color):
         #prints ocr to log box
