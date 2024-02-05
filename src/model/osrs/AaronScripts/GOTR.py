@@ -176,15 +176,15 @@ class OSRSGOTR(OSRSBot):
             self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
             self.mouse.click()
         api_m.wait_til_gained_xp("Runecraft", 3)
-        pag.keyDown('shift')
-        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
-        pag.keyUp('shift')
-        if altar := self.get_nearest_tag(clr.GREEN):
-            self.log_msg("Crafting third set of essence..")
-            self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
-            self.mouse.click()
-        api_m.wait_til_gained_xp("Runecraft", 3)
+        # pag.keyDown('shift')
+        # self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
+        # self.mouse.click()
+        # pag.keyUp('shift')
+        # if altar := self.get_nearest_tag(clr.GREEN):
+        #     self.log_msg("Crafting third set of essence..")
+        #     self.mouse.move_to(altar.random_point(), mouseSpeed='fast')
+        #     self.mouse.click()
+        # api_m.wait_til_gained_xp("Runecraft", 3)
         time.sleep(1.5) # Gives enough time to let your character become idle
         if portal := self.get_nearest_tag(clr.ORANGE):
             self.log_msg("Heading back to main area..")
@@ -371,12 +371,12 @@ class OSRSGOTR(OSRSBot):
         self.work_at_bench()
         self.workbench_is_inv_full(api_m)
         pag.press('space')
-        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # fill giant pouch
-        self.mouse.click()
-        time.sleep(1)
-        #self.repair_pouches(api_m)
-        self.log_msg("Waiting until inventory is full #3..")
-        self.work_at_bench()
+        # # self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # fill giant pouch
+        # # self.mouse.click()
+        # time.sleep(1)
+        # #self.repair_pouches(api_m)
+        # self.log_msg("Waiting until inventory is full #3..")
+        # self.work_at_bench()
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
             self.is_guardian_defeated()
             if self.chatbox_text_BLACK_first_line(contains="You have no more guardian fragments to combine"):
@@ -477,8 +477,8 @@ class OSRSGOTR(OSRSBot):
 
     def empty_pouches(self):
         pag.keyDown('shift')
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
-        self.mouse.click()
+        # self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        # self.mouse.click()
         self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
         self.mouse.click()
         self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
