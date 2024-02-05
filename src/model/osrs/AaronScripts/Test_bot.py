@@ -99,13 +99,9 @@ class OSRSTest_Bot(OSRSBot):
             # else:
             #     self.log_msg("Did not find yellow marker.")
             # time.sleep(0.1)
-            altar = self.get_nearest_tag(clr.GREEN)
-            self.mouse.move_to(self.win.inventory_slots[0].random_point())
+            remains = self.get_nearest_tag(clr.RED)
+            self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
             self.mouse.click()
-            time.sleep(0.2)
-            self.mouse.move_to(altar.random_point())
-            self.mouse.click()
-            time.sleep(0.2)
            
     def ocr_extract_text_check(self,window,font,color):
         #prints ocr to log box

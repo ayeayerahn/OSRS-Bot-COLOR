@@ -61,7 +61,7 @@ class OSRSGOTR(OSRSBot):
     def first_sequence(self, api_m:MorgHTTPSocket):
         self.log_msg("                                    First sequence")
         self.guardian_remains(api_m)
-        self.activate_spec()
+        #self.activate_spec()
         time.sleep(136)
         top_rubble = self.get_nearest_tag(clr.RED)
         self.mouse.move_to(top_rubble.random_point())
@@ -148,10 +148,12 @@ class OSRSGOTR(OSRSBot):
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
             self.is_guardian_defeated()
             time.sleep(1)
-        self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.click()
+        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
         time.sleep(1)
-        self.repair_pouches(api_m)
+        #self.repair_pouches(api_m)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more guardian essence"):
@@ -199,7 +201,7 @@ class OSRSGOTR(OSRSBot):
         self.log_msg("Waiting for portal to appear.")
         while not portal:
             portal = self.get_nearest_tag(clr.CYAN)
-            self.activate_spec()
+            #self.activate_spec()
             self.is_guardian_defeated()
             time.sleep(1)
         self.mouse.move_to(portal.random_point())
@@ -224,7 +226,7 @@ class OSRSGOTR(OSRSBot):
         counter = 0
         while not portal:
             portal = self.get_nearest_tag(clr.CYAN)
-            self.activate_spec()
+            #self.activate_spec()
             self.is_guardian_defeated()
             counter += 1
             time.sleep(1)
@@ -255,7 +257,7 @@ class OSRSGOTR(OSRSBot):
         self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
         time.sleep(1)
-        self.repair_pouches(api_m)
+        #self.repair_pouches(api_m)
         self.mouse.move_to(remains.random_point(), mouseSpeed='fast')
         self.mouse.click()
         # Check if inventory is full
@@ -297,10 +299,10 @@ class OSRSGOTR(OSRSBot):
         chosen_altar = None
         altar = None
 
-        if law_pillar:
-            altar = self.get_nearest_tag(clr.LIGHT_PURPLE)
-            chosen_altar = 'Law'    
-        elif mind_pillar:
+        # if law_pillar:
+        #     altar = self.get_nearest_tag(clr.LIGHT_PURPLE)
+        #     chosen_altar = 'Law'    
+        if mind_pillar:
             altar = self.get_nearest_tag(clr.DARK_ORANGE)
             chosen_altar = 'Mind'
         elif earth_pillar:
@@ -372,7 +374,7 @@ class OSRSGOTR(OSRSBot):
         self.mouse.move_to(self.win.inventory_slots[3].random_point(), mouseSpeed='fastest') # fill giant pouch
         self.mouse.click()
         time.sleep(1)
-        self.repair_pouches(api_m)
+        #self.repair_pouches(api_m)
         self.log_msg("Waiting until inventory is full #3..")
         self.work_at_bench()
         while not self.chatbox_text_QUEST(contains="Your inventory is too full to hold any more essence"):
@@ -464,12 +466,12 @@ class OSRSGOTR(OSRSBot):
             self.mouse.click()  
 
     def fill_pouches(self, api_m: MorgHTTPSocket):
-        self.mouse.move_to(self.win.inventory_slots[0].random_point(), mouseSpeed='fastest') # small pouch
+        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # small pouch
         self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[1].random_point(), mouseSpeed='fastest') # medium pouch
+        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # medium pouch
         self.mouse.click()
-        self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
-        self.mouse.click()
+        # self.mouse.move_to(self.win.inventory_slots[2].random_point(), mouseSpeed='fastest') # large pouch
+        # self.mouse.click()
         #time.sleep(1)
         #self.repair_pouches(api_m)
 
