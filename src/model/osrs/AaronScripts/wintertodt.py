@@ -101,46 +101,46 @@ class OSRSwintertodt(OSRSBot):
         else:
             self.log_msg("No supply crate found in your inventory.")
         time.sleep(0.5)
-        # while True:
-        #     if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[1]):
-        #         if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[0]):
-        #             self.log_msg("We have at least two trout.. Exiting bank.")
-        #             break
-        #         else:
-        #             self.mouse.move_to(trout_bank.random_point())
-        #             self.mouse.click()
-        #             break
-        #     trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)                  
-        #     if not trout:
-        #         self.log_msg("No trout in your inventory.")
-        #         if trout_bank := imsearch.search_img_in_rect(trout_bank_img, self.win.game_view):
-        #             self.log_msg("Withdrawing two trout.")
-        #             self.mouse.move_to(trout_bank.random_point())
-        #             self.mouse.click()
-        #             time.sleep(0.5)
-        #             self.mouse.click() 
-        #             break                   
         while True:
-            if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[1]):
-                if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[0]):
-                    self.log_msg("We have at least two shark.. Exiting bank.")
+            if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[1]):
+                if trout := imsearch.search_img_in_rect(trout_img, self.win.inventory_slots[0]):
+                    self.log_msg("We have at least two trout.. Exiting bank.")
                     break
                 else:
-                    self.mouse.move_to(shark_bank.random_point())
+                    self.mouse.move_to(trout_bank.random_point())
                     self.mouse.click()
                     break
-            shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)                  
-            if not shark:
-                self.log_msg("No shark in your inventory.")
-                if shark_bank := imsearch.search_img_in_rect(shark_bank_img, self.win.game_view):
-                    self.log_msg("Withdrawing two shark.")
-                    self.mouse.move_to(shark_bank.random_point())
+            trout = imsearch.search_img_in_rect(trout_img, self.win.control_panel)                  
+            if not trout:
+                self.log_msg("No trout in your inventory.")
+                if trout_bank := imsearch.search_img_in_rect(trout_bank_img, self.win.game_view):
+                    self.log_msg("Withdrawing two trout.")
+                    self.mouse.move_to(trout_bank.random_point())
                     self.mouse.click()
-                    time.sleep(0.5)
-                    self.mouse.click() 
                     time.sleep(0.5)
                     self.mouse.click() 
                     break                   
+        # while True:
+        #     if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[1]):
+        #         if shark := imsearch.search_img_in_rect(shark_img, self.win.inventory_slots[0]):
+        #             self.log_msg("We have at least two shark.. Exiting bank.")
+        #             break
+        #         else:
+        #             self.mouse.move_to(shark_bank.random_point())
+        #             self.mouse.click()
+        #             break
+        #     shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)                  
+        #     if not shark:
+        #         self.log_msg("No shark in your inventory.")
+        #         if shark_bank := imsearch.search_img_in_rect(shark_bank_img, self.win.game_view):
+        #             self.log_msg("Withdrawing two shark.")
+        #             self.mouse.move_to(shark_bank.random_point())
+        #             self.mouse.click()
+        #             time.sleep(0.5)
+        #             self.mouse.click() 
+        #             time.sleep(0.5)
+        #             self.mouse.click() 
+        #             break                   
             # elif trout:
             #     self.log_msg("We have enough food. Exiting bank.")
             #     break
@@ -252,7 +252,7 @@ class OSRSwintertodt(OSRSBot):
         shark_img = imsearch.BOT_IMAGES.joinpath("Aarons_images", "shark.png")
         shark = imsearch.search_img_in_rect(shark_img, self.win.control_panel)          
         current_hp = self.get_hp()
-        if current_hp <= 40:
+        if current_hp <= 5:
             if shark:
                 self.mouse.move_to(shark.random_point())
                 self.mouse.click()

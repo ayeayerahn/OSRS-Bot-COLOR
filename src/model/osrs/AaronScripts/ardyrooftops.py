@@ -39,7 +39,7 @@ class OSRSardyrooftops(OSRSBot):
     def main_loop(self):
 
         # Setup APIs
-        api_m = MorgHTTPSocket()
+        # api_m = MorgHTTPSocket()
         #api_s = StatusSocket()
 
         # pag.press('b')
@@ -60,7 +60,7 @@ class OSRSardyrooftops(OSRSBot):
             self.return_to_start() # Check if Agility icon is visible
 
             #self.log_msg("Checking for green obstacles")
-            self.green_obstacle(api_m) # If neither of the above are true, find and click green obstacle
+            self.green_obstacle() # If neither of the above are true, find and click green obstacle
 
 
             self.update_progress((time.time() - start_time) / end_time)
@@ -88,14 +88,25 @@ class OSRSardyrooftops(OSRSBot):
                 self.sleep(11,12)
 
     
-    def green_obstacle(self, api_m: MorgHTTPSocket):
+    def green_obstacle(self):
         obstacle_tiles = self.get_all_tagged_in_rect(self.win.game_view, clr.GREEN) # Since we moved the camera, check again
+        time.sleep(1.0)
         try: 
             self.mouse.move_to(obstacle_tiles[0].random_point(), mouseSpeed = 'fastest')
             self.mouse.click()
         except: self.log_msg("Can't find a green obstacle")
         #self.mouse.click()
-        api_m.wait_til_gained_xp("Agility", 20)
+        # api_m.wait_til_gained_xp("Agility", 20)
+        last_xp = self.get_total_xp()
+        counter = 0
+        while counter < 50:
+            new_xp = self.get_total_xp()
+            if new_xp != last_xp:
+                break
+            else:
+                counter += 1
+                self.log_msg(f"Seconds elapsed: {counter}")
+                time.sleep(1)
         self.sleep(1.5,2)
 
     def check_for_marks(self):

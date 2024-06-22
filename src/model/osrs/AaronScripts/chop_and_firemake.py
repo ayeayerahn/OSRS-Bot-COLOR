@@ -114,7 +114,7 @@ class OSRSchop_and_firemake(AaronFunctions):
     def wait_for_fire(self):
         last_xp = self.get_total_xp()
         counter = 0
-        while counter < 25:
+        while counter < 50:
             new_xp = self.get_total_xp()
             if new_xp != last_xp:
                 break
